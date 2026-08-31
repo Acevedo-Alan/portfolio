@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<!--
+  index.html
+  Markup only. Single-page portfolio, terminal/CLI visual theme, ES/EN
+  copy toggle. Styling lives in styles.css, translations in i18n.js,
+  behavior in main.js — see those files' header comments.
+-->
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Alan Acevedo — Full Stack Developer</title>
+<meta name="description" content="Full Stack Developer building web and mobile applications with Java, Spring Boot, React and TypeScript." />
+
+<!-- Favicon: paths are placeholders — point these at real favicon files
+     once they exist in the project (or swap for a data-URI SVG if you'd
+     rather avoid separate binary assets). -->
+<link rel="shortcut icon" href="imgs/favicon.ico" type="image/x-icon">
+<link rel="icon" href="imgs/favicon.ico" type="image/x-icon">
+
+
+<!-- Open Graph / Twitter Card: title and description are reused verbatim
+     from <title> and the meta description above so the three stay in
+     sync. og:url and the image URLs need an absolute production URL,
+     which doesn't exist yet — replace REPLACE_WITH_PRODUCTION_DOMAIN
+     below once the site is deployed; shipping a guessed domain would be
+     worse than an obvious placeholder. og-image.svg (1200x630, same
+     terminal look as the page itself) lives alongside index.html. -->
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Alan Acevedo — Full Stack Developer" />
+<meta property="og:description" content="Full Stack Developer building web and mobile applications with Java, Spring Boot, React and TypeScript." />
+<meta property="og:image" content="https://REPLACE_WITH_PRODUCTION_DOMAIN/og-image.svg" />
+<meta property="og:url" content="https://REPLACE_WITH_PRODUCTION_DOMAIN/" />
+<meta property="og:locale" content="es_AR" />
+<meta property="og:locale:alternate" content="en_US" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Alan Acevedo — Full Stack Developer" />
+<meta name="twitter:description" content="Full Stack Developer building web and mobile applications with Java, Spring Boot, React and TypeScript." />
+<meta name="twitter:image" content="https://REPLACE_WITH_PRODUCTION_DOMAIN/og-image.svg" />
+
+<!--
+  Sets data-theme synchronously, before any CSS paints, so the page never
+  flashes the wrong theme. Kept inline and tiny on purpose: this is the one
+  script that must block rendering; everything else is deferred (see the
+  script tags below).
+-->
+<script>
+  (function () {
+    try {
+      var saved = localStorage.getItem('portfolio-theme');
+      var systemLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+      document.documentElement.setAttribute('data-theme', saved || (systemLight ? 'light' : 'dark'));
+    } catch (e) {}
+  })();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script src="i18n.js" defer></script>
+<script src="main.js" defer></script>
+</head>
+<body>
+
+<a href="#main-content" class="skip-link" data-i18n="skip-link">Saltar al contenido principal</a>
+
+<div class="terminal">
+  <header>
+    <div class="titlebar">
+      <div class="dots" aria-hidden="true"><span></span><span></span><span></span></div>
+      <div class="url-bar">
+        <span class="url-bar-icon" aria-hidden="true">&gt;_</span>
+        <span class="titlebar-label">alan@portfolio: ~</span>
+      </div>
+      <span class="new-tab" aria-hidden="true">+</span>
+
+      <!-- Desktop nav: inline in the header row, hidden below ~768px in
+           favor of .cmdnav--mobile below. -->
+      <nav class="cmdnav cmdnav--desktop" id="cmdnav" aria-label="Secciones">
+        <a href="#whoami" data-section="whoami">whoami</a>
+        <a href="#stack" data-section="stack">stack</a>
+        <a href="#experiencia" data-section="experiencia">experiencia</a>
+        <a href="#proyectos" data-section="proyectos">proyectos</a>
+        <a href="#educacion" data-section="educacion">educación</a>
+        <a href="#contacto" data-section="contacto">contacto</a>
+      </nav>
+
+      <div class="titlebar-controls">
+        <div class="lang-toggle" role="group" aria-label="Idioma / Language">
+          <button id="btn-es" class="active" type="button" aria-pressed="true" aria-label="Cambiar a español">ES</button>
+          <span class="lang-sep" aria-hidden="true">/</span>
+          <button id="btn-en" type="button" aria-pressed="false" aria-label="Switch to English">EN</button>
+        </div>
+        <button id="theme-toggle" class="icon-btn" type="button" aria-pressed="false" aria-label="Cambiar a tema claro" title="Cambiar a tema claro">
+          <span id="theme-icon" aria-hidden="true">☾</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile nav: separate row below the header, shown only below
+         ~768px, with its own left-aligned horizontal scroll (never
+         flex-end — see the .cmdnav--mobile comment in styles.css for why
+         that combination clips instead of scrolling). -->
+    <nav class="cmdnav cmdnav--mobile" id="cmdnav-mobile" aria-label="Secciones">
+      <a href="#whoami" data-section="whoami">whoami</a>
+      <a href="#stack" data-section="stack">stack</a>
+      <a href="#experiencia" data-section="experiencia">experiencia</a>
+      <a href="#proyectos" data-section="proyectos">proyectos</a>
+      <a href="#educacion" data-section="educacion">educación</a>
+      <a href="#contacto" data-section="contacto">contacto</a>
+    </nav>
+  </header>
+
+  <main id="main-content" tabindex="-1">
+
+    <!-- WHOAMI -->
+    <section id="whoami">
+      <h2 class="sr-only">whoami</h2>
+      <div class="prompt" aria-hidden="true"><span class="user">alan@portfolio</span><span class="sep">:</span><span class="path">~</span><span class="sep">$</span><span class="cmd">whoami</span></div>
+      <div class="box-header" aria-hidden="true"><span class="box-corner">┌─</span><span class="box-label" data-i18n="box-whoami"></span><span class="box-line">────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span><span class="box-corner">┐</span></div>
+      <p class="box-subtitle" data-i18n="box-whoami-subtitle"></p>
+      <div class="fade-in">
+        <h1 class="hero-name" aria-label="Alan Acevedo">
+          <div class="ascii-name" aria-hidden="true">
+            <div class="ascii-fit ascii-fit--full"><pre class="ascii-art">   _   _      _   _  _     _   ___ _____   _____ ___   ___  
+  /_\ | |    /_\ | \| |   /_\ / __| __\ \ / / __|   \ / _ \ 
+ / _ \| |__ / _ \| .` |  / _ \ (__| _| \ V /| _|| |) | (_) |
+/_/ \_\____/_/ \_\_|\_| /_/ \_\___|___| \_/ |___|___/ \___/ </pre></div>
+            <div class="ascii-fit ascii-fit--split">
+              <pre class="ascii-art">   _   _      _   _  _ 
+  /_\ | |    /_\ | \| |
+ / _ \| |__ / _ \| .` |
+/_/ \_\____/_/ \_\_|\_|</pre>
+              <pre class="ascii-art">   _   ___ _____   _____ ___   ___  
+  /_\ / __| __\ \ / / __|   \ / _ \ 
+ / _ \ (__| _| \ V /| _|| |) | (_) |
+/_/ \_\___|___| \_/ |___|___/ \___/ </pre>
+            </div>
+          </div>
+          <span class="cursor" aria-hidden="true"></span>
+        </h1>
+        <div class="hero-role" data-i18n="role">Full Stack Developer — Java/Spring · React</div>
+        <div class="info-card">
+          <div class="meta-row">
+            <div class="item"><span class="label" data-i18n="meta-location-label">location</span> Santa Fe, Argentina</div>
+          </div>
+          <p class="hero-bio" data-i18n="bio"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- STACK -->
+    <section id="stack">
+      <h2 class="sr-only">stack</h2>
+      <div class="prompt" aria-hidden="true"><span class="user">alan@portfolio</span><span class="sep">:</span><span class="path">~</span><span class="sep">$</span><span class="cmd">cat stack.conf</span></div>
+      <div class="box-header" aria-hidden="true"><span class="box-corner">┌─</span><span class="box-label" data-i18n="box-stack"></span><span class="box-line">────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span><span class="box-corner">┐</span></div>
+      <p class="box-subtitle" data-i18n="box-stack-subtitle"></p>
+      <div class="stack-grid fade-in">
+        <div class="stack-row"><span class="cat">frontend</span><span class="items"><b>React</b> · <b>Angular</b> · HTML5 · CSS3 · Tailwind CSS · Bootstrap · PWA · IndexedDB</span></div>
+        <div class="stack-row"><span class="cat">backend</span><span class="items"><b>Java</b> · <b>Spring Boot</b> · <b>Spring Security</b> · Node.js · JWT · <b>REST APIs · Server-Sent Events</b> · HMAC / Session Security · Rate Limiting</span></div>
+        <div class="stack-row"><span class="cat">mobile</span><span class="items">React Native · Figma</span></div>
+        <div class="stack-row"><span class="cat">data</span><span class="items">PostgreSQL · MySQL · MySQL Workbench · DBeaver</span></div>
+        <div class="stack-row"><span class="cat">testing</span><span class="items">JUnit 5 · Mockito</span></div>
+        <div class="stack-row"><span class="cat">tools</span><span class="items">Git · GitHub · CI/CD · Docker · Nginx · Postman · Jira · Scrum</span></div>
+      </div>
+    </section>
+
+    <!-- EXPERIENCIA -->
+    <section id="experiencia">
+      <h2 class="sr-only">experiencia</h2>
+      <div class="prompt" aria-hidden="true"><span class="user">alan@portfolio</span><span class="sep">:</span><span class="path">~</span><span class="sep">$</span><span class="cmd">cat experiencia.log</span></div>
+      <div class="box-header" aria-hidden="true"><span class="box-corner">┌─</span><span class="box-label" data-i18n="box-experiencia"></span><span class="box-line">────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span><span class="box-corner">┐</span></div>
+      <p class="box-subtitle" data-i18n="box-experiencia-subtitle"></p>
+      <div class="fade-in">
+
+        <div class="exp-item">
+          <div class="exp-head">
+            <div class="exp-title-row"><span class="exp-num">1.</span><h3 class="exp-title">RDAM — <span data-i18n="rdam-title"></span></h3></div>
+            <span class="exp-tag" data-i18n="rdam-tag"></span>
+          </div>
+          <div class="exp-meta"><span class="org">Poder Judicial de Santa Fe</span> · Campus 2026 · i2T Software Factory</div>
+          <ul class="exp-bullets" data-i18n-list="rdam-bullets"></ul>
+          <div class="chip-row">
+            <span class="chip">Java 17</span><span class="chip">Spring Boot 3</span><span class="chip">Spring Security 6</span>
+            <span class="chip">JWT · 2FA/OTP</span><span class="chip">PostgreSQL + RLS</span><span class="chip">React 18</span>
+            <span class="chip">Material UI</span><span class="chip">Tailwind CSS</span><span class="chip">Docker</span>
+          </div>
+        </div>
+
+        <div class="exp-item">
+          <div class="exp-head">
+            <div class="exp-title-row"><span class="exp-num">2.</span><h3 class="exp-title">DOMUS+ — <span data-i18n="domus-title"></span></h3></div>
+            <span class="exp-tag" data-i18n="domus-tag"></span>
+          </div>
+          <div class="exp-meta"><span class="org" data-i18n="domus-org"></span></div>
+          <ul class="exp-bullets" data-i18n-list="domus-bullets"></ul>
+          <div class="chip-row">
+            <span class="chip">React Native</span><span class="chip">TypeScript</span><span class="chip">Node.js</span>
+            <span class="chip">MySQL</span><span class="chip">Figma</span><span class="chip">Jira · Scrum</span>
+          </div>
+        </div>
+
+        <div class="exp-item">
+          <div class="exp-head">
+            <div class="exp-title-row"><span class="exp-num">3.</span><h3 class="exp-title" data-i18n="clinica-title"></h3></div>
+            <span class="exp-tag" data-i18n="clinica-tag"></span>
+          </div>
+          <div class="exp-meta"><span class="org" data-i18n="clinica-org"></span></div>
+          <ul class="exp-bullets" data-i18n-list="clinica-bullets"></ul>
+          <div class="chip-row">
+            <span class="chip">Node.js</span><span class="chip">Express</span><span class="chip">MySQL</span><span class="chip">JWT</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- PROYECTOS -->
+    <section id="proyectos">
+      <h2 class="sr-only">proyectos</h2>
+      <div class="prompt" aria-hidden="true"><span class="user">alan@portfolio</span><span class="sep">:</span><span class="path">~</span><span class="sep">$</span><span class="cmd">ls proyectos/</span></div>
+      <div class="box-header" aria-hidden="true"><span class="box-corner">┌─</span><span class="box-label" data-i18n="box-proyectos"></span><span class="box-line">────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span><span class="box-corner">┐</span></div>
+      <p class="box-subtitle" data-i18n="box-proyectos-subtitle"></p>
+      <div class="proj-list fade-in">
+
+        <div class="proj-card featured">
+          <div class="proj-head">
+            <h3 class="proj-name"><span class="hexa-wave" aria-hidden="true"><span>H</span><span>E</span><span>X</span><span>A</span></span><span class="sr-only">HEXA</span> — Color Match Challenge</h3>
+            <div class="proj-links">
+              <a href="https://github.com/Acevedo-Alan" target="_blank" rel="noopener" title="Reemplazar con la URL real del repo">[code]</a>
+            </div>
+          </div>
+          <p class="proj-desc" data-i18n="hexa-desc"></p>
+          <ul class="proj-bullets" data-i18n-list="hexa-bullets"></ul>
+          <div class="chip-row">
+            <span class="chip">Java 21</span><span class="chip">Spring Boot 4</span><span class="chip">PostgreSQL</span>
+            <span class="chip">Server-Sent Events</span><span class="chip">React 19</span><span class="chip">TypeScript</span>
+            <span class="chip">Vite</span><span class="chip">Tailwind CSS</span><span class="chip">IndexedDB</span><span class="chip">PWA</span>
+          </div>
+        </div>
+
+        <div class="proj-card">
+          <div class="proj-head">
+            <h3 class="proj-name">Lana &amp; Lino</h3>
+            <div class="proj-links">
+              <a href="https://github.com/Acevedo-Alan" target="_blank" rel="noopener" title="Reemplazar con la URL real del repo">[code]</a>
+            </div>
+          </div>
+          <p class="proj-desc" data-i18n="lana-desc"></p>
+          <div class="chip-row">
+            <span class="chip">JavaScript</span><span class="chip">HTML5</span><span class="chip">CSS3</span>
+            <span class="chip">Node.js</span><span class="chip">Express</span><span class="chip">Web Audio API</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- EDUCACION -->
+    <section id="educacion">
+      <h2 class="sr-only">educación</h2>
+      <div class="prompt" aria-hidden="true"><span class="user">alan@portfolio</span><span class="sep">:</span><span class="path">~</span><span class="sep">$</span><span class="cmd">cat educacion.txt</span></div>
+      <div class="box-header" aria-hidden="true"><span class="box-corner">┌─</span><span class="box-label" data-i18n="box-educacion"></span><span class="box-line">────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span><span class="box-corner">┐</span></div>
+      <p class="box-subtitle" data-i18n="box-educacion-subtitle"></p>
+      <div class="edu-item fade-in">
+        <h3 class="edu-degree" data-i18n="edu-degree"></h3>
+        <div class="edu-org">IES Santa Fe</div>
+        <div class="edu-meta">Santa Fe, Argentina · <span data-i18n="edu-year"></span></div>
+        <span class="edu-status" data-i18n="edu-status"></span>
+      </div>
+    </section>
+
+    <!-- CONTACTO -->
+    <section id="contacto">
+      <h2 class="sr-only">contacto</h2>
+      <div class="prompt" aria-hidden="true"><span class="user">alan@portfolio</span><span class="sep">:</span><span class="path">~</span><span class="sep">$</span><span class="cmd">whoami --contacto</span></div>
+      <div class="box-header" aria-hidden="true"><span class="box-corner">┌─</span><span class="box-label" data-i18n="box-contacto"></span><span class="box-line">────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span><span class="box-corner">┐</span></div>
+      <p class="box-subtitle" data-i18n="box-contacto-subtitle"></p>
+      <div class="fade-in">
+        <div class="contact-links">
+          <a href="mailto:acevedo.j.alan@gmail.com"><span class="k">email</span> acevedo.j.alan@gmail.com</a>
+          <a href="https://github.com/Acevedo-Alan" target="_blank" rel="noopener"><span class="k">github</span> github.com/Acevedo-Alan</a>
+          <a href="https://linkedin.com/in/acevedo-alan" target="_blank" rel="noopener"><span class="k">linkedin</span> linkedin.com/in/acevedo-alan</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- INTERACTIVE TERMINAL -->
+  <div class="term-console" aria-label="Terminal">
+    <div class="prompt" aria-hidden="true"><span class="user">alan@portfolio</span><span class="sep">:</span><span class="path">~</span><span class="sep">$</span><span class="cmd">./terminal --interactive</span></div>
+    <div class="box-header" aria-hidden="true"><span class="box-corner">┌─</span><span class="box-label" data-i18n="box-console"></span><span class="box-line">────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span><span class="box-corner">┐</span></div>
+    <p class="box-subtitle" data-i18n="box-console-subtitle"></p>
+    <div class="fade-in">
+      <div id="term-log" class="term-log" role="log" aria-live="polite"></div>
+      <form id="term-form" class="term-input-row" autocomplete="off">
+        <span class="term-prompt-inline" aria-hidden="true"><span class="user">alan@portfolio</span><span class="sep">:</span><span class="path">~</span><span class="sep">$</span></span>
+        <label for="term-input" class="sr-only" data-i18n="term-input-label">Entrada de comandos de la terminal</label>
+        <input type="text" id="term-input" class="term-input" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" />
+      </form>
+    </div>
+  </div>
+
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-track">
+      <span>Java</span><span>Spring Boot</span><span>React</span><span>TypeScript</span><span>PostgreSQL</span>
+      <span>Docker</span><span>Server-Sent Events</span><span>React Native</span><span>Node.js</span><span>Git</span>
+      <span>Java</span><span>Spring Boot</span><span>React</span><span>TypeScript</span><span>PostgreSQL</span>
+      <span>Docker</span><span>Server-Sent Events</span><span>React Native</span><span>Node.js</span><span>Git</span>
+    </div>
+  </div>
+
+  <footer>
+    <span data-i18n="footer"></span>
+    <span><span class="heart">♥</span> <span data-i18n="footer-made"></span> Alan</span>
+  </footer>
+</div>
+
+<script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

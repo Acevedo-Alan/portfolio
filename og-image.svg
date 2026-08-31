@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <title>Alan Acevedo — Full Stack Developer</title>
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="0%" r="75%">
+      <stop offset="0%" stop-color="#00CC33" stop-opacity="0.10"/>
+      <stop offset="100%" stop-color="#00CC33" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="#0A0E17"/>
+  <rect width="1200" height="630" fill="url(#glow)"/>
+
+  <!-- terminal window chrome, matching .terminal/.titlebar in styles.css -->
+  <rect x="60" y="60" width="1080" height="510" rx="14" fill="#11161F" stroke="#232B3A" stroke-width="1.5"/>
+  <line x1="60" y1="106" x2="1140" y2="106" stroke="#232B3A" stroke-width="1.5"/>
+  <circle cx="92" cy="83" r="7" fill="#F2A65A"/>
+  <circle cx="114" cy="83" r="7" fill="#F2E15A"/>
+  <circle cx="136" cy="83" r="7" fill="#6EE7F2"/>
+  <text x="600" y="89" font-family="'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace" font-size="15" fill="#77859F" text-anchor="middle">alan@portfolio: ~</text>
+
+  <!-- ASCII-art name, same figlet output used in index.html -->
+  <text font-family="'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace" font-size="24" font-weight="700" fill="#00FF41" text-anchor="middle" xml:space="preserve"><tspan x="600" y="258">   _   _      _   _  _     _   ___ _____   _____ ___   ___  </tspan><tspan x="600" y="286">  /_\ | |    /_\ | \| |   /_\ / __| __\ \ / / __|   \ / _ \ </tspan><tspan x="600" y="314"> / _ \| |__ / _ \| .` |  / _ \ (__| _| \ V /| _|| |) | (_) |</tspan><tspan x="600" y="342">/_/ \_\____/_/ \_\_|\_| /_/ \_\___|___| \_/ |___|___/ \___/ </tspan></text>
+
+  <text x="600" y="400" font-family="'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace" font-size="22" fill="#D6DEEB" text-anchor="middle">Full Stack Developer — Java/Spring · React</text>
+
+  <text x="600" y="540" font-family="'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace" font-size="16" fill="#77859F" text-anchor="middle">alan@portfolio:~$ github.com/Acevedo-Alan</text>
+</svg>

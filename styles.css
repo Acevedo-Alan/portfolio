@@ -1,0 +1,884 @@
+/*
+ * styles.css
+ * All visual styling for the portfolio: theme tokens (dark/light), the
+ * terminal-window chrome, section layout, the experience/projects/education
+ * content blocks, the marquee ticker, and scroll/fade animations.
+ *
+ * Naming convention: lowercase kebab-case throughout.
+ *   .block            component root (e.g. .proj-card, .exp-item)
+ *   .block-part        a piece of that component (e.g. .exp-title, .proj-name)
+ *   .block--variant     a visual variant of a component, double-dash (e.g. .proj-card--featured)
+ * Utility classes (.sr-only, .skip-link) follow the same lowercase-kebab pattern.
+ */
+
+/*
+ * Two moods, one design system: dark theme is terminal/hacker
+ * green-on-black (Matrix), light theme is warm paper/ink (sun-bleached
+ * cream, terracotta, espresso) — deliberately not an inverted green, so
+ * every component below is written against theme-scoped custom
+ * properties (--accent, --bg, --text, --dither-dot, --accent-wash, etc.)
+ * rather than literal colors. Only those tokens differ between the two
+ * `:root` blocks; every structural/layout rule (bracket-line section
+ * headers, the hollow dashed hero name, the info card, the merged
+ * header row, the halftone dither) is shared and untouched by the theme
+ * switch. In the dark theme, --bg/--text/--border stay a neutral navy
+ * gray-blue rather than also going green, so long-form body copy (bio,
+ * bullets) doesn't turn into a wall of saturated color — green/amber is
+ * reserved for what it's meant to accent: the hero name, section header
+ * brackets, borders and links. See the light theme block below for its
+ * own palette and contrast notes.
+ */
+:root {
+  --bg: #0A0E17;
+  --bg-soft: #0D121C;
+  --surface: #11161F;
+  --surface-2: #161C28;
+  --border: #232B3A;
+  --border-soft: #1A2130;
+  --text: #D6DEEB;
+  --text-dim: #7C8AA5;
+  --text-faint: #77859F;
+  --accent: #00CC33;
+  --accent-soft: #00CC3322;
+  --accent-2: #00FF41;
+  --accent-2-soft: #00FF4122;
+  --accent-dim: #003B00;
+  --dither-dot: #00FF4114;
+  /* Faint tinted washes layered into gradients/glows elsewhere (the
+     info-card, the featured project card, the ambient body::before glow)
+     — split out as tokens rather than hardcoded hex so the light theme
+     below can recolor them to warm tones instead of inheriting green. */
+  --accent-wash: #00FF410A;
+  --glow-1: #00CC330F;
+  --glow-2: #00FF4109;
+  --radius: 6px;
+  --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  --shadow: #000000aa;
+  /* Dark ink for text drawn on top of the --accent color, e.g. the skip
+     link. Default for a bright, saturated accent; the light theme below
+     overrides this, since its --accent is deliberately darker. */
+  --accent-ink: #0A0E17;
+}
+
+html[data-theme="light"] {
+  /* Warm counterpart to the dark theme's Matrix green — sun-bleached
+     paper and amber ink, not an inverted green. --surface reads as
+     slightly deeper/aged than --bg (paper stacked on paper) rather than
+     brighter, which is why it's darker here, unlike the dark theme where
+     --surface is a lighter step up from --bg. --accent/--accent-2 are
+     tuned a shade darker than a "pure" terracotta/mustard would land,
+     specifically so they clear WCAG AA (4.5:1) as text against both --bg
+     and the slightly deeper --surface (see contrast note below). */
+  --bg: #FAF3E7;
+  --bg-soft: #F2E8D5;
+  --surface: #F2E8D5;
+  --surface-2: #FBF3E0;
+  --border: #E0CFA9;
+  --border-soft: #ECDFC0;
+  --text: #2B2013;
+  --text-dim: #6B5D47;
+  --text-faint: #8A7B63;
+  /* Contrast (WCAG AA, needs >=4.5 for normal-size text):
+     accent vs bg     5.69:1 | accent vs surface     5.17:1
+     accent-2 vs bg   6.03:1 | accent-2 vs surface    5.48:1 */
+  --accent: #A63F16;
+  --accent-soft: #A63F161A;
+  --accent-2: #855015;
+  --accent-2-soft: #8550151A;
+  --accent-dim: #F0DEC2;
+  --dither-dot: #A63F1614;
+  --accent-wash: #A63F160A;
+  --glow-1: #A63F160F;
+  --glow-2: #8550150A;
+  --shadow: #00000022;
+  /* Overrides the "constant across both themes" --accent-ink set in
+     :root above: that dark-navy value assumes a bright, saturated accent
+     (true of the dark theme's green). This theme's --accent is
+     deliberately darker for AA text contrast, so dark ink on top of it
+     would itself fail contrast — light cream ink is the fix, and still
+     reads correctly as "ink stamped on a colored seal" for the skip-link. */
+  --accent-ink: #FAF3E7;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 15px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  transition: background .2s ease, color .2s ease;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -10%, var(--glow-1), transparent),
+    radial-gradient(ellipse 60% 40% at 100% 20%, var(--glow-2), transparent);
+  pointer-events: none;
+  z-index: 0;
+}
+
+a { color: inherit; text-decoration: none; }
+
+::selection { background: var(--accent); color: var(--bg); }
+
+.wrap {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ---------- Accessibility utilities ---------- */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 12px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  padding: 10px 16px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  z-index: 100;
+  transition: top .15s ease;
+}
+.skip-link:focus {
+  top: 12px;
+}
+
+/* Keyboard-only focus ring, applied globally so no interactive element is
+   missed. Uses accent-2 (brighter phosphor green) so it reads as distinct
+   from the accent (deeper green) hover/active states used elsewhere. */
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--accent-2);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+/* Inset variants: these two live inside containers with overflow-x/hidden,
+   so a positive outline-offset would get clipped by the parent. */
+.lang-toggle button:focus-visible,
+nav.cmdnav a:focus-visible {
+  outline-offset: -2px;
+  border-radius: 0;
+}
+
+/* ---------- Terminal frame ---------- */
+.terminal {
+  max-width: 900px;
+  margin: 40px auto;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--bg);
+  box-shadow: 0 40px 100px -30px var(--shadow), 0 0 0 1px #ffffff05 inset;
+  position: relative;
+  z-index: 1;
+  transition: background .2s ease, border-color .2s ease;
+}
+
+/* Single merged header row: dots, url-bar pill, "+" tab affordance, the
+   section nav (flexed to fill the middle and right-align its links), then
+   the lang/theme controls — replaces the old two-row titlebar+cmdnav
+   layout. Nav can still shrink and horizontally scroll its own links
+   (min-width: 0 is what makes that possible in a flex row) without ever
+   pushing the dots or url-bar pill out of view. */
+.titlebar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  backdrop-filter: blur(8px);
+}
+
+.dots { display: flex; gap: 7px; flex-shrink: 0; }
+.dots span {
+  width: 11px; height: 11px; border-radius: 50%;
+  background: var(--border);
+  border: 1px solid var(--border-soft);
+}
+.dots span:nth-child(1) { background: #F2A65A55; }
+.dots span:nth-child(2) { background: #F2E15A44; }
+.dots span:nth-child(3) { background: #6EE7F244; }
+
+/* Address-bar-style pill wrapping the shell path label. */
+.url-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 1;
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface-2);
+  padding: 5px 10px;
+}
+.url-bar-icon { color: var(--text-faint); font-size: 11px; flex-shrink: 0; }
+.titlebar-label {
+  color: var(--text-faint);
+  font-size: 12.5px;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+/* Decorative "new tab" affordance — not interactive, so it's a plain span
+   rather than a focusable no-op button. */
+.new-tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  color: var(--text-faint);
+  font-size: 13px;
+  line-height: 1;
+  user-select: none;
+}
+
+.titlebar-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.icon-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  color: var(--text-dim);
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+  transition: background .15s, color .15s, border-color .15s;
+}
+.icon-btn:hover { color: var(--accent); border-color: var(--accent-soft); }
+
+/* Compact "ES/EN" pill: still two independent buttons (ids, aria-pressed
+   and aria-label are untouched, so setLang() keeps working exactly as
+   before) — only the chrome around them changed, from two solid boxes to
+   one bordered pill with a dim "/" separator between them. */
+.lang-toggle {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 5px 9px;
+  font-size: 11px;
+}
+.lang-toggle button {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: var(--text-faint);
+  cursor: pointer;
+  font-family: var(--mono);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  transition: color .15s;
+}
+.lang-toggle button.active { color: var(--accent); }
+.lang-toggle button:hover:not(.active) { color: var(--text-dim); }
+.lang-toggle .lang-sep { color: var(--border); }
+
+/* ---------- Nav ---------- */
+/* Plain text links, no tab-strip background/underline. Split into two
+   separate <nav> elements (desktop inline in the header row, mobile as
+   its own row below it — see index.html) rather than one nav whose
+   justify-content flips with viewport width: justify-content: flex-end
+   combined with overflow-x: auto is a flexbox trap where overflowing
+   content gets clipped at the start edge instead of becoming scrollable
+   (that's what was cutting "whoami" down to "ımı"). Two navs sidestep it
+   for good — the desktop one has the full row width and never needs to
+   scroll, and the mobile one only ever scrolls flex-start. Both share
+   this base rule and only override display/layout per breakpoint below. */
+nav.cmdnav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  justify-content: flex-start;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+nav.cmdnav::-webkit-scrollbar { display: none; }
+nav.cmdnav a {
+  padding: 6px 10px;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: var(--text-faint);
+  white-space: nowrap;
+  transition: color .15s;
+}
+nav.cmdnav a:hover { color: var(--text); }
+nav.cmdnav a.active { color: var(--accent); }
+
+.cmdnav--desktop {
+  min-width: 0;
+  margin-left: auto;
+}
+
+/* nav.cmdnav.cmdnav--mobile (not just .cmdnav--mobile): the base
+   `nav.cmdnav { display: flex; }` rule above is an element+class
+   selector (specificity 0,1,1), which beats a single-class selector
+   (0,1,0) regardless of source order — a plain `.cmdnav--mobile` here
+   was silently losing to it, so both navs rendered as flex at every
+   width. Matching the same element+class shape (0,1,1 vs. 0,1,1, and
+   this one wins on source order) is what actually applies the override. */
+nav.cmdnav.cmdnav--mobile {
+  display: none;
+  padding: 6px 16px;
+  border-top: 1px solid var(--border);
+  background: var(--bg-soft);
+}
+
+@media (max-width: 768px) {
+  nav.cmdnav.cmdnav--desktop { display: none; }
+  nav.cmdnav.cmdnav--mobile { display: flex; }
+}
+
+/* ---------- Sections ---------- */
+main { padding: 8px 0 10px; }
+
+section { padding: 42px 34px 8px; scroll-margin-top: 90px; }
+section + section { border-top: 1px dashed var(--border-soft); padding-top: 38px; }
+
+.prompt {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 22px;
+  color: var(--text-faint);
+  font-size: 13px;
+}
+.prompt .user { color: var(--accent-2); }
+.prompt .path { color: var(--text-faint); }
+.prompt .cmd { color: var(--text); font-weight: 500; }
+.prompt .sep { color: var(--border); }
+
+/* ---------- Box-drawing section headers ---------- */
+/* "┌─ LABEL ─────────┐" built from real box-drawing corner characters
+   plus a literal run of repeated "─" glyphs (160 of them — comfortably
+   more than any realistic header width) rather than a CSS background
+   bar, so the rule/fill is genuinely text, not a decorative box-model
+   trick. It sits in a flex-1, overflow: hidden span so the excess run
+   just gets clipped to whatever width is available, filling the rest of
+   the header responsively with no JS needed. Corner, label and line are
+   all the same accent color, per the Matrix/warm header treatment. */
+.box-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+  color: var(--text-faint);
+  font-size: 11px;
+}
+.box-corner { color: var(--accent); flex-shrink: 0; }
+.box-label {
+  color: var(--accent);
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+}
+.box-line {
+  flex: 1;
+  min-width: 12px;
+  overflow: hidden;
+  white-space: nowrap;
+  color: var(--accent);
+}
+
+.box-subtitle {
+  color: var(--text-faint);
+  font-size: 11.5px;
+  margin-bottom: 20px;
+}
+
+/* ---------- Hero ---------- */
+/* Matrix-style halftone dither: a plain CSS radial-gradient dot grid set
+   as the section's own background-image. Backgrounds always paint behind
+   an element's content by spec, so this needs no absolute positioning or
+   z-index layering to stay clear of the text above it. It's a static
+   tiled pattern with nothing animated, so there's nothing for
+   prefers-reduced-motion to disable. Kept to #whoami and the featured
+   project card (see .proj-card.featured) rather than the whole page. */
+#whoami {
+  background-image: radial-gradient(circle at 1px 1px, var(--dither-dot) 1px, transparent 1.4px);
+  background-size: 6px 6px;
+}
+
+/* Literal ASCII-art name (figlet "small" font) instead of a CSS-
+   approximated effect. Each .ascii-fit group holds one or more .ascii-art
+   <pre> blocks at a fixed base font-size; main.js measures the group's
+   natural (unscaled) width against its available width and applies a
+   uniform transform: scale() so the art always fits without overflowing,
+   with a floor so it never shrinks past a readable size (see
+   fitAsciiGroup() in main.js) — CSS alone has no way to shrink a
+   fixed-grid monospace block to fit without breaking its letterforms.
+   Below 520px the single-line full name is swapped for a two-line
+   first-name/last-name split instead of scaling further; both groups
+   exist in the DOM at all times and this media query just picks which
+   one is visible (the other measures 0 width and fitAsciiGroup() no-ops
+   on it — see main.js). */
+.hero-name {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.ascii-name { min-width: 0; }
+.ascii-fit { overflow: hidden; }
+.ascii-fit--split { display: none; }
+@media (max-width: 520px) {
+  .ascii-fit--full { display: none; }
+  .ascii-fit--split { display: block; }
+}
+.ascii-art {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 20px;
+  line-height: 1.15;
+  color: var(--accent);
+  white-space: pre;
+  transform-origin: left top;
+}
+.hero-name .cursor {
+  display: inline-block;
+  width: 10px; height: 1em;
+  background: var(--accent);
+  margin-bottom: 4px;
+  animation: blink 1s steps(1) infinite;
+  flex-shrink: 0;
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+.hero-role {
+  color: var(--accent);
+  font-size: 15.5px;
+  font-weight: 600;
+  margin-bottom: 18px;
+}
+
+/* ---------- Info card ---------- */
+/* Terminal "window panel" for the location/bio block: thin accent border,
+   a faint accent wash echoing .proj-card.featured's glow technique, dim
+   labels vs. bright values for a small key/value contrast. */
+.info-card {
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  background: linear-gradient(180deg, var(--accent-wash), var(--surface) 60%);
+  padding: 18px 20px;
+}
+
+.meta-row {
+  /* Down to a single "location" item now that github/linkedin live only in
+     #contacto (see .contact-links) — flex-wrap/gap need no changes since
+     they never assumed a fixed item count. */
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 22px;
+  font-size: 13px;
+  color: var(--text);
+  margin-bottom: 14px;
+}
+.meta-row .item { display: flex; align-items: center; gap: 7px; }
+.meta-row .label { color: var(--text-faint); }
+.meta-row a:hover { color: var(--accent-2); }
+
+.hero-bio {
+  color: var(--text-dim);
+  font-size: 14px;
+  line-height: 1.75;
+  max-width: 62ch;
+}
+.hero-bio strong { color: var(--text); font-weight: 600; }
+
+/* ---------- Stack ---------- */
+.stack-grid { display: flex; flex-direction: column; gap: 10px; }
+.stack-row {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 14px;
+  font-size: 13.5px;
+  align-items: baseline;
+}
+.stack-row .cat {
+  color: var(--accent-2);
+  white-space: nowrap;
+}
+.stack-row .cat::before { content: '['; color: var(--text-faint); }
+.stack-row .cat::after { content: ']'; color: var(--text-faint); }
+.stack-row .items { color: var(--text-dim); }
+.stack-row .items b { color: var(--text); font-weight: 500; }
+
+@media (max-width: 560px) {
+  .stack-row { grid-template-columns: 1fr; gap: 3px; }
+}
+
+/* ---------- Experience ---------- */
+.exp-item { margin-bottom: 30px; }
+.exp-item:last-child { margin-bottom: 0; }
+.exp-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+.exp-title-row { display: flex; align-items: baseline; gap: 10px; }
+.exp-num { color: var(--text-faint); font-size: 13px; }
+.exp-title { font-size: 16px; font-weight: 700; color: var(--text); }
+.exp-tag {
+  font-size: 10.5px;
+  padding: 2px 7px;
+  border-radius: 3px;
+  background: var(--accent-2-soft);
+  color: var(--accent-2);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+.exp-meta { color: var(--text-faint); font-size: 12.5px; margin-bottom: 12px; }
+.exp-meta .org { color: var(--text-dim); }
+.exp-bullets { list-style: none; display: flex; flex-direction: column; gap: 7px; margin-bottom: 12px; }
+.exp-bullets li {
+  color: var(--text-dim);
+  font-size: 13.5px;
+  line-height: 1.65;
+  padding-left: 18px;
+  position: relative;
+}
+.exp-bullets li::before {
+  content: '▸';
+  color: var(--accent);
+  position: absolute;
+  left: 0;
+  font-size: 11px;
+  top: 3px;
+}
+.chip-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  font-size: 11px;
+  color: var(--text-faint);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 8px;
+  background: var(--surface);
+}
+
+/* ---------- Projects ---------- */
+.proj-list { display: flex; flex-direction: column; gap: 18px; }
+.proj-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: 22px 24px;
+  transition: border-color .2s, transform .2s;
+}
+.proj-card:hover { border-color: var(--accent-soft); }
+/* Featured card gets the same halftone dither treatment as #whoami (see
+   that rule for why it's a plain background-image, not a positioned
+   overlay) layered under its existing accent glow gradient — both driven
+   by tokens so they recolor correctly per theme instead of staying green
+   under the light theme. */
+.proj-card.featured {
+  border-color: var(--accent-soft);
+  background-image:
+    radial-gradient(circle at 1px 1px, var(--dither-dot) 1px, transparent 1.4px),
+    linear-gradient(180deg, var(--accent-wash), var(--surface) 40%);
+  background-size: 6px 6px, auto;
+}
+
+.proj-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+.proj-name { display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 700; color: var(--text); }
+.proj-name::before { content: '▸'; color: var(--accent); font-size: 13px; }
+
+/* HEXA title: one letter at a time lights up, wave travels H->E->X->A->H...
+   Each letter's own flash color also rotates through all 6 swatch colors
+   from lap to lap (12-beat pattern = lcm(4 letters, 6 colors) before the
+   letter/color pairing repeats exactly). */
+.hexa-wave span {
+  display: inline-block;
+  animation-duration: 4.8s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+.hexa-wave span:nth-child(1) { animation-name: hexa-wave-h; }
+.hexa-wave span:nth-child(2) { animation-name: hexa-wave-e; }
+.hexa-wave span:nth-child(3) { animation-name: hexa-wave-x; }
+.hexa-wave span:nth-child(4) { animation-name: hexa-wave-a; }
+
+@keyframes hexa-wave-h {
+  0%, 100% { color: var(--text); }
+  3.33% { color: #F25C54; }
+  10% { color: var(--text); }
+  36.66% { color: #B491C8; }
+  43.33% { color: var(--text); }
+  70% { color: #6BCB77; }
+  76.67% { color: var(--text); }
+}
+@keyframes hexa-wave-e {
+  0%, 100% { color: var(--text); }
+  11.66% { color: #F2C14E; }
+  18.33% { color: var(--text); }
+  45% { color: #F2789F; }
+  51.67% { color: var(--text); }
+  78.33% { color: #5AA9E6; }
+  85% { color: var(--text); }
+}
+@keyframes hexa-wave-x {
+  0%, 100% { color: var(--text); }
+  20% { color: #6BCB77; }
+  26.67% { color: var(--text); }
+  53.33% { color: #F25C54; }
+  60% { color: var(--text); }
+  86.66% { color: #B491C8; }
+  93.33% { color: var(--text); }
+}
+@keyframes hexa-wave-a {
+  0%, 100% { color: var(--text); }
+  28.33% { color: #5AA9E6; }
+  35% { color: var(--text); }
+  61.67% { color: #F2C14E; }
+  68.33% { color: var(--text); }
+  95% { color: #F2789F; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hexa-wave span { animation: none; }
+}
+.proj-links { display: flex; gap: 12px; font-size: 12px; }
+.proj-links a { color: var(--text-faint); border-bottom: 1px dotted var(--border); transition: color .15s, border-color .15s; }
+.proj-links a:hover { color: var(--accent-2); border-color: var(--accent-2); }
+
+.proj-desc { color: var(--text-dim); font-size: 13.5px; line-height: 1.7; margin-bottom: 20px; max-width: 68ch; }
+
+.proj-bullets { list-style: none; display: flex; flex-direction: column; gap: 6px; margin-bottom: 22px; }
+.proj-bullets li {
+  color: var(--text-dim);
+  font-size: 13px;
+  line-height: 1.6;
+  padding-left: 18px;
+  position: relative;
+}
+.proj-bullets li::before { content: '▸'; color: var(--accent); position: absolute; left: 0; font-size: 10px; top: 3px; }
+.proj-bullets strong { color: var(--accent); font-weight: 700; }
+
+/* HEXA signature: hex swatches */
+.swatch-row { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+.swatch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  cursor: default;
+}
+.swatch .chip-color {
+  width: 30px; height: 30px;
+  border-radius: 6px;
+  border: 1px solid #ffffff22;
+  transition: transform .18s ease;
+}
+.swatch:hover .chip-color { transform: translateY(-3px) scale(1.08); }
+.swatch .chip-hex {
+  font-size: 9.5px;
+  color: var(--text-faint);
+  letter-spacing: 0.02em;
+}
+
+/* ---------- Education ---------- */
+.edu-item { display: flex; flex-direction: column; gap: 3px; }
+.edu-degree { font-size: 15.5px; font-weight: 700; color: var(--text); }
+.edu-org { color: var(--accent-2); font-size: 13.5px; }
+.edu-meta { color: var(--text-faint); font-size: 12.5px; }
+.edu-status {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--accent);
+  background: var(--accent-soft);
+  padding: 3px 9px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+/* ---------- Contact / footer ---------- */
+.contact-links { display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
+.contact-links a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-dim);
+  font-size: 14px;
+  width: fit-content;
+  border-bottom: 1px solid transparent;
+  transition: color .15s, border-color .15s;
+}
+.contact-links a:hover { color: var(--accent); border-color: var(--accent); }
+.contact-links .k { color: var(--text-faint); }
+
+/* ---------- Interactive terminal console ---------- */
+/* Lives outside <main> (a sibling of it, not a `section`) so it's excluded
+   from the `main section` NodeList that drives scroll-spy nav highlighting
+   and from the fade-in-on-scroll observer's section-count assumptions —
+   its own .fade-in inner wrapper still participates in that same fade
+   animation, it's just not scroll-spied. */
+.term-console {
+  padding: 42px 34px 30px;
+  border-top: 1px dashed var(--border-soft);
+}
+
+.term-log {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  max-height: 260px;
+  overflow-y: auto;
+  margin-bottom: 14px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.term-line { color: var(--text-dim); }
+.term-line--echo { color: var(--text); }
+.cmd-hl { color: var(--accent); }
+
+.term-prompt-inline { display: inline-flex; align-items: baseline; gap: 2px; flex-shrink: 0; }
+.term-prompt-inline .user { color: var(--accent-2); }
+.term-prompt-inline .sep { color: var(--border); }
+.term-prompt-inline .path { color: var(--text-faint); }
+.term-typed { color: var(--text); font-weight: 500; }
+
+.term-input-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  border-top: 1px solid var(--border-soft);
+  padding-top: 14px;
+  border-radius: 4px;
+}
+.term-input-row:focus-within {
+  outline: 2px solid var(--accent-2);
+  outline-offset: 4px;
+}
+.term-input {
+  flex: 1;
+  min-width: 2ch;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 13px;
+  caret-color: var(--accent);
+}
+
+/* ---------- Marquee ticker ---------- */
+.marquee {
+  border-top: 1px dashed var(--border-soft);
+  overflow: hidden;
+  padding: 14px 0;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  gap: 28px;
+  animation: marquee-scroll 26s linear infinite;
+}
+.marquee-track span {
+  font-size: 12px;
+  color: var(--text-faint);
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+.marquee-track span::after { content: '·'; color: var(--border); margin-left: 28px; }
+@keyframes marquee-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track { animation: none; }
+}
+
+footer {
+  padding: 16px 34px 30px;
+  color: var(--text-faint);
+  font-size: 12px;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+footer .heart { color: var(--accent); }
+
+@media (max-width: 620px) {
+  section { padding: 32px 20px 8px; }
+  .term-console { padding: 32px 20px 24px; }
+  footer { padding: 20px; }
+  /* Dots + url-bar pill stay visible per spec; the "+" affordance is
+     purely decorative, so it's the first thing to go when space is
+     tight, and the nav falls back to its own horizontal scroll instead
+     of wrapping the row. */
+  .new-tab { display: none; }
+  .url-bar { max-width: 34vw; }
+}
+
+/* fade-in on scroll */
+.fade-in {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity .55s ease, transform .55s ease;
+}
+.fade-in.in { opacity: 1; transform: translateY(0); }
