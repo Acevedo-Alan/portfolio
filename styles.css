@@ -868,8 +868,6 @@ footer {
   flex-wrap: wrap;
   gap: 10px;
 }
-footer .heart { color: var(--accent); }
-
 @media (max-width: 620px) {
   section { padding: 32px 20px 8px; }
   .term-console { padding: 32px 20px 24px; }
