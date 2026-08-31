@@ -354,7 +354,14 @@ nav.cmdnav a:hover { color: var(--text); }
 nav.cmdnav a.active { color: var(--accent); }
 
 .cmdnav--desktop {
-  min-width: 0;
+  /* flex-shrink: 0 so the nav never gives up space — otherwise it and
+     .url-bar (both min-width: 0) shrink proportionally to their own
+     content size when the row is tight, and since the nav's unshrunk
+     width is the larger of the two, it silently ate the squeeze and
+     clipped/scrolled its own links (e.g. "contacto"). The url-bar is
+     built to shrink gracefully (ellipsis on .titlebar-label), so it
+     should absorb the deficit first. */
+  flex-shrink: 0;
   margin-left: auto;
 }
 
