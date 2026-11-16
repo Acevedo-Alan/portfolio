@@ -61,3 +61,7 @@ mascot.init();
 // Deep links (e.g. /#contacto) open that window; otherwise start on "about me".
 const hash = location.hash.slice(1);
 windows.open(windows.has(hash) ? hash : 'whoami', { quiet: true });
+
+// Everything is wired: tell the boot guard in index.html not to show the fallback.
+document.documentElement.classList.add('app-ready');
+document.documentElement.classList.remove('app-failed');

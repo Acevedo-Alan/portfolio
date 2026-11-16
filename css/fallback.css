@@ -1,0 +1,45 @@
+/*
+ * fallback.css — what visitors see when the app can't start (html.app-failed,
+ * set by the boot guard in index.html). Instead of a dead desktop, show a
+ * banner explaining why and the content as plain, scrollable sections.
+ * Has no effect when the app boots normally.
+ */
+
+.boot-error { display: none; }
+
+html.app-failed body { overflow: auto; background: var(--beige); height: auto; }
+
+html.app-failed .boot-error {
+  display: block; margin: 0; padding: 14px 20px; background: var(--balloon);
+  border-bottom: 2px solid #E68B2C; font-size: 13.5px; line-height: 1.6;
+}
+html.app-failed .boot-error p + p { margin-top: 8px; }
+html.app-failed .boot-error code { background: #fff; border: 1px solid #ACA899; padding: 0 4px; font-family: var(--mono); font-size: 12.5px; }
+
+/* The desktop chrome is meaningless without JS */
+html.app-failed .wallpaper,
+html.app-failed .desktop-icons,
+html.app-failed .taskbar,
+html.app-failed .start-menu,
+html.app-failed .mascot,
+html.app-failed .balloon,
+html.app-failed .skip-link,
+html.app-failed #win-terminal,
+html.app-failed #win-bugsweeper,
+html.app-failed #win-winamp,
+html.app-failed #win-papelera { display: none; }
+
+/* Content windows become stacked cards */
+html.app-failed #desktop { position: static; max-width: 860px; margin: 0 auto; padding: 16px; }
+html.app-failed #desktop > section {
+  display: block; margin: 0 0 16px; background: #fff; border: 1px solid #7F9DB9; border-radius: 6px; overflow: hidden;
+}
+html.app-failed .win-body { overflow: visible; }
+html.app-failed .win-body.explorer { display: block; }
+html.app-failed .ex-tree { display: none; }
+html.app-failed .tabs, html.app-failed .dialog-btns { display: none; }
+html.app-failed .tab-panel[hidden] { display: block; }   /* show every tab's content */
+html.app-failed h2.sr-only {
+  position: static; width: auto; height: auto; margin: 0 0 10px; clip: auto; overflow: visible;
+  font: 700 18px/1.2 var(--title); color: var(--link); text-transform: capitalize;
+}

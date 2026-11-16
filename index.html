@@ -57,12 +57,33 @@
 <link rel="stylesheet" href="css/apps/winamp.css">
 <link rel="stylesheet" href="css/apps/recycle.css">
 <link rel="stylesheet" href="css/responsive.css">
+<link rel="stylesheet" href="css/fallback.css">
+<!-- Boot guard: if the app can't start (opened from file://, where browsers
+     block ES modules, or a script error before it finished booting), flag
+     <html class="app-failed">. css/fallback.css then shows a banner and the
+     content as plain readable sections instead of a dead desktop.
+     js/main.js adds .app-ready when everything is wired. -->
+<script>
+  (function () {
+    var root = document.documentElement;
+    function fail() { if (!root.classList.contains('app-ready')) root.classList.add('app-failed'); }
+    if (location.protocol === 'file:') fail();
+    window.addEventListener('error', fail);
+  })();
+</script>
 <!-- ES modules (deferred by default). Needs http(s): serve the folder, e.g. `npx serve` -->
-<script type="module" src="js/main.js"></script>
+<script type="module" src="js/main.js" onerror="document.documentElement.classList.add('app-failed')"></script>
 </head>
 <body>
 
 <a href="#desktop" class="skip-link" data-i18n="skip-link">Saltar al escritorio</a>
+
+<!-- Shown only when the app fails to start (see the boot guard in <head>); text is
+     hardcoded in both languages because the i18n modules may not have loaded. -->
+<div class="boot-error" role="alert">
+  <p><strong>ES:</strong> el escritorio no pudo iniciarse. Si abriste <code>index.html</code> con doble clic, los módulos ES no cargan desde <code>file://</code>. Serví la carpeta con <code>npx serve .</code> (o <code>python -m http.server</code>) y abrí <code>http://localhost:3000</code>. Mientras tanto, el contenido está abajo.</p>
+  <p><strong>EN:</strong> the desktop couldn't start. If you opened <code>index.html</code> by double-click, ES modules don't load from <code>file://</code>. Serve the folder with <code>npx serve .</code> (or <code>python -m http.server</code>) and open <code>http://localhost:3000</code>. The content is below in the meantime.</p>
+</div>
 
 <!-- Icon sprite: simple XP-style gradient icons, defined once and reused
      with <use>. -->
