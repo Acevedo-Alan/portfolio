@@ -1,0 +1,38 @@
+/* ---------- Patito (rubber-duck mascot, scripted tips) ---------- */
+.mascot {
+  position: fixed; right: 16px; bottom: calc(var(--taskbar-h) + 8px); z-index: 9300;
+  display: flex; flex-direction: column; align-items: flex-end; gap: 12px; pointer-events: none;
+}
+.mascot[hidden] { display: none; }
+.mascot > * { pointer-events: auto; }
+.mascot-char {
+  width: 68px; height: 68px; padding: 0; background: none; border: 0;
+  filter: drop-shadow(1px 3px 2px rgba(0, 0, 0, .4));
+}
+.mascot-char svg { width: 100%; height: 100%; overflow: visible; }
+.mascot-char:hover svg { transform: translateY(-2px); }
+.mascot-char:focus-visible { outline: 2px dotted #fff; outline-offset: 2px; border-radius: 8px; }
+.mascot.hop .mascot-char svg { animation: mascot-hop .4s ease-out; }
+@keyframes mascot-hop { 30% { transform: translateY(-8px); } 60% { transform: translateY(0); } 80% { transform: translateY(-3px); } }
+.mascot .eyes { transform-box: fill-box; transform-origin: center; animation: mascot-blink 4.5s infinite; }
+@keyframes mascot-blink { 0%, 93%, 100% { transform: scaleY(1); } 96% { transform: scaleY(.1); } }
+.mascot .bob { animation: mascot-bob 3.2s ease-in-out infinite; }
+@keyframes mascot-bob { 50% { transform: translateY(-2px) rotate(-1.5deg); } }
+
+.mascot-bubble {
+  position: relative; width: min(270px, calc(100vw - 32px)); padding: 10px 28px 12px 12px;
+  background: var(--balloon); border: 1px solid #000; border-radius: 8px;
+  box-shadow: 2px 3px 6px rgba(0, 0, 0, .4); font-size: 12.5px; line-height: 1.5;
+  animation: win-pop .2s ease-out;
+}
+.mascot-bubble[hidden] { display: none; }
+.mascot-bubble::after {
+  content: ""; position: absolute; right: 26px; bottom: -11px;
+  border: 6px solid transparent; border-top: 10px solid #000; border-bottom: 0;
+}
+.mascot-x {
+  position: absolute; top: 3px; right: 4px; background: none; border: 0; cursor: var(--hand);
+  font: 700 16px/1 var(--ui); color: #333; padding: 0 4px;
+}
+.mascot-x:hover { color: #C8391B; }
+.sm-right li > button { color: #0A2A80; font-weight: 700; }

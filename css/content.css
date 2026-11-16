@@ -1,0 +1,104 @@
+/* ---------- Content: shared ---------- */
+.box-subtitle {
+  font: 700 15px/1.2 var(--title); color: var(--link);
+  padding-bottom: 6px; margin-bottom: 14px; border-bottom: 1px solid #C5D0EE;
+}
+
+/* ---------- Hero ---------- */
+.hero {
+  margin: -16px -20px 16px; padding: 18px 20px;
+  background: linear-gradient(90deg, #1C52D8, #5C92F0); color: #fff;
+}
+.hero-name { font: italic 700 30px/1.1 var(--title); text-shadow: 2px 2px 0 rgba(0, 0, 40, .4); }
+.hero-role { margin-top: 4px; font-size: 13.5px; color: #E8F0FF; }
+
+.info-card { border: 1px solid #7F9DB9; background: #F6F8FD; padding: 12px 14px; }
+.meta-row { display: flex; flex-wrap: wrap; gap: 6px 22px; margin-bottom: 8px; }
+.meta-row .label { color: #555; margin-right: 4px; }
+.meta-row .label::after { content: ":"; }
+.hero-bio { line-height: 1.8; max-width: 62ch; }
+
+/* ---------- Experience & projects (task-pane style groups) ---------- */
+.exp-item, .proj-card { border: 1px solid #7F9DB9; margin-bottom: 16px; padding-bottom: 12px; background: #fff; }
+.exp-item:last-child, .proj-card:last-child { margin-bottom: 0; }
+.exp-item > :not(.exp-head), .proj-card > :not(.proj-head) { margin-left: 12px; margin-right: 12px; }
+
+.exp-head, .proj-head {
+  display: flex; justify-content: space-between; align-items: center; gap: 8px 12px; flex-wrap: wrap;
+  padding: 6px 10px; margin-bottom: 10px;
+  background: linear-gradient(90deg, #fff 0%, #C6D3F7 100%);
+}
+.exp-title-row { display: flex; align-items: baseline; gap: 8px; }
+.exp-num { color: #555; }
+.exp-title, .proj-name { font: 700 13.5px/1.3 var(--ui); color: var(--link); }
+.exp-tag {
+  font-size: 10.5px; padding: 1px 8px; border-radius: 9px; font-weight: 700;
+  background: var(--select); color: #fff; text-transform: uppercase; letter-spacing: .02em;
+}
+.exp-meta { color: #555; font-size: 12px; margin-bottom: 10px; }
+.exp-meta .org { color: #000; font-weight: 700; }
+
+.exp-bullets, .proj-bullets { list-style: none; display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+.exp-bullets li, .proj-bullets li { padding-left: 16px; position: relative; line-height: 1.75; }
+.exp-bullets li::before, .proj-bullets li::before {
+  content: ""; position: absolute; left: 2px; top: 7px; width: 6px; height: 6px;
+  background: var(--select); border-radius: 50%;
+}
+.exp-bullets strong, .proj-bullets strong { font-weight: 700; }
+
+.chip-row { display: flex; flex-wrap: wrap; gap: 5px; }
+.chip {
+  font-size: 11px; padding: 1px 7px; background: var(--beige);
+  border: 1px solid #ACA899; border-radius: 2px; color: #222;
+}
+
+.proj-card.featured { border-color: var(--select); box-shadow: 0 0 0 1px #98B8F8; }
+.proj-name { display: flex; align-items: center; gap: 4px; }
+.proj-links { font-size: 12px; }
+.proj-links a { margin-left: 8px; }
+.proj-desc { line-height: 1.75; margin-bottom: 12px; max-width: 68ch; }
+
+/* HEXA title: one letter at a time lights up, wave travels H->E->X->A->H...
+   Each letter's flash color rotates through all 6 swatch colors from lap to
+   lap (12-beat pattern = lcm(4 letters, 6 colors)). */
+.hexa-wave span { display: inline-block; animation-duration: 4.8s; animation-iteration-count: infinite; animation-timing-function: linear; }
+.hexa-wave span:nth-child(1) { animation-name: hexa-wave-h; }
+.hexa-wave span:nth-child(2) { animation-name: hexa-wave-e; }
+.hexa-wave span:nth-child(3) { animation-name: hexa-wave-x; }
+.hexa-wave span:nth-child(4) { animation-name: hexa-wave-a; }
+@keyframes hexa-wave-h {
+  0%, 100% { color: var(--link); } 3.33% { color: #F25C54; } 10% { color: var(--link); }
+  36.66% { color: #B491C8; } 43.33% { color: var(--link); } 70% { color: #2E9A2E; } 76.67% { color: var(--link); }
+}
+@keyframes hexa-wave-e {
+  0%, 100% { color: var(--link); } 11.66% { color: #D99A00; } 18.33% { color: var(--link); }
+  45% { color: #F2789F; } 51.67% { color: var(--link); } 78.33% { color: #2A86D6; } 85% { color: var(--link); }
+}
+@keyframes hexa-wave-x {
+  0%, 100% { color: var(--link); } 20% { color: #2E9A2E; } 26.67% { color: var(--link); }
+  53.33% { color: #F25C54; } 60% { color: var(--link); } 86.66% { color: #B491C8; } 93.33% { color: var(--link); }
+}
+@keyframes hexa-wave-a {
+  0%, 100% { color: var(--link); } 28.33% { color: #2A86D6; } 35% { color: var(--link); }
+  61.67% { color: #D99A00; } 68.33% { color: var(--link); } 95% { color: #F2789F; }
+}
+@media (prefers-reduced-motion: reduce) { .hexa-wave span { animation: none; } }
+
+/* ---------- Education ---------- */
+.edu-item { display: flex; flex-direction: column; gap: 3px; }
+.edu-degree { font: 700 15px/1.3 var(--title); }
+.edu-org { color: var(--link); font-weight: 700; }
+.edu-meta { color: #555; font-size: 12px; }
+.edu-status {
+  align-self: flex-start; margin-top: 8px; font-size: 11px; font-weight: 700; padding: 2px 9px;
+  background: #E6F4DA; color: #2B6A12; border: 1px solid #6FA64B; border-radius: 2px;
+}
+
+/* ---------- Contact ---------- */
+.contact-links { display: flex; flex-direction: column; border: 1px solid #7F9DB9; }
+.contact-links a {
+  display: flex; align-items: center; gap: 12px; padding: 8px 12px; color: #000; text-decoration: none;
+}
+.contact-links a + a { border-top: 1px solid #E1E6F4; }
+.contact-links a:hover, .contact-links a:focus-visible { background: var(--select); color: #fff; outline: none; }
+.contact-links .k { width: 70px; flex: none; font-weight: 700; }

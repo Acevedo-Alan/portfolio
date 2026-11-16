@@ -1,0 +1,22 @@
+/* ---------- Small screens: windows go full-screen, one at a time ---------- */
+@media (max-width: 700px) {
+  .window {
+    left: 0 !important; top: 0 !important; width: 100vw !important; height: calc(100dvh - var(--taskbar-h)) !important;
+    border-radius: 0; border-width: 0; box-shadow: none;
+  }
+  .wb-max { display: none; }
+  .desktop-icons { display: flex; flex-wrap: wrap; align-content: flex-start; gap: 4px; padding: 8px; }
+  .d-icon { position: static; left: auto !important; top: auto !important; }
+  .d-icon { width: 30%; max-width: 96px; }
+  .start-btn { padding: 0 16px 0 8px; font-size: 18px; }
+  .tray { gap: 8px; padding: 0 8px; }
+  .clock { display: none; }
+  .task { flex-basis: 100px; }
+  .hero-name { font-size: 26px; }
+  .win-body { padding: 14px 14px 18px; }
+  .win-body.sp-body { padding: 8px; }
+  .win-body.explorer { padding: 0; grid-template-columns: 1fr; grid-template-rows: auto minmax(0, 1fr); }
+  .ex-tree { padding: 8px; max-height: 40vh; }
+  .ex-main { padding: 14px; }
+  .rz { display: none; }
+}

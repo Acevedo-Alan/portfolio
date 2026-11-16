@@ -1,0 +1,19 @@
+/* ---------- Recycle Bin ("deprecated code") ---------- */
+.win-body.bin-body { padding: 0; display: flex; flex-direction: column; overflow: hidden; background: #fff; }
+.bin-bar { flex: none; display: flex; gap: 6px; padding: 6px 8px; background: var(--beige); border-bottom: 1px solid #ACA899; }
+.bin-main { flex: 1; min-height: 0; overflow: auto; padding: 12px 14px; }
+.bin-intro { color: #444; margin-bottom: 10px; }
+.bin-table { width: 100%; border-collapse: collapse; border: 1px solid #7F9DB9; }
+.bin-table th {
+  text-align: left; font-weight: 400; padding: 4px 10px; font-size: 12px;
+  background: linear-gradient(#fff, #ECEBE5); border-bottom: 1px solid #C9CFDD; border-right: 1px solid #D8D6C8;
+}
+.bin-table td { padding: 5px 10px; vertical-align: top; border-bottom: 1px solid #F0EFE6; }
+.bin-table td:first-child { font-family: var(--mono); font-size: 12px; white-space: nowrap; }
+.bin-table td:first-child::before {
+  content: ""; display: inline-block; width: 12px; height: 14px; margin-right: 6px; vertical-align: -2px;
+  background: linear-gradient(#fff, #D5DAE6); border: 1px solid #7F8FAF; border-radius: 1px;
+}
+.bin-table tr:hover td { background: var(--select); color: #fff; }
+.bin-empty { padding: 40px 12px; text-align: center; color: #555; }
+.bin-status { flex: none; padding: 3px 10px; background: var(--beige); border-top: 1px solid #fff; font-size: 12px; color: #222; }

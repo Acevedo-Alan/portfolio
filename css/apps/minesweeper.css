@@ -1,0 +1,46 @@
+/* ---------- Bug Sweeper (Minesweeper) ---------- */
+.win-body.ms-body {
+  background: var(--beige); display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 12px;
+}
+.ms-frame {
+  background: #C0C0C0; padding: 6px;
+  border: 3px solid; border-color: #fff #808080 #808080 #fff;
+}
+.ms-head {
+  display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 6px; padding: 4px 6px;
+  border: 2px solid; border-color: #808080 #fff #fff #808080;
+}
+.ms-lcd {
+  min-width: 3.6ch; padding: 2px 4px; background: #000; color: #FF2A2A; text-align: center;
+  font: 700 22px/1 var(--mono); letter-spacing: 1px;
+}
+.ms-face {
+  width: 34px; height: 34px; padding: 0; font-size: 20px; line-height: 1; cursor: var(--hand);
+  background: #C0C0C0; border: 3px solid; border-color: #fff #808080 #808080 #fff;
+}
+.ms-face:active { border-color: #808080 #fff #fff #808080; }
+.ms-grid {
+  display: grid; border: 3px solid; border-color: #808080 #fff #fff #808080; background: #808080;
+}
+.ms-cell {
+  width: 28px; height: 28px; padding: 0; display: grid; place-items: center; cursor: var(--hand);
+  font: 700 15px/1 var(--mono); color: #000; background: #C0C0C0;
+  border: 3px solid; border-color: #fff #808080 #808080 #fff;
+}
+.ms-cell:focus-visible { outline: 2px dotted #000; outline-offset: -5px; }
+.ms-cell.open { border: 1px solid #808080; background: #BDBDBD; cursor: var(--cursor); }
+.ms-cell.boom { background: #FF3B30; }
+.ms-cell[data-n="1"] { color: #0000FF; } .ms-cell[data-n="2"] { color: #007B00; } .ms-cell[data-n="3"] { color: #FF0000; }
+.ms-cell[data-n="4"] { color: #00007B; } .ms-cell[data-n="5"] { color: #7B0000; } .ms-cell[data-n="6"] { color: #007B7B; }
+.ms-cell[data-n="7"] { color: #000; } .ms-cell[data-n="8"] { color: #7B7B7B; }
+.ms-tools { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: center; }
+.ms-tools .btn-xp[aria-pressed="true"] { background: linear-gradient(#CECABB, #E3E1D6); box-shadow: inset 1px 1px 3px rgba(0, 0, 0, .3), inset 0 0 0 2px #FFC83C; }
+.ms-hint { font-size: 11.5px; color: #444; text-align: center; max-width: 34ch; }
+.ms-msg { min-height: 1.4em; font-weight: 700; text-align: center; }
+.ms-msg.won { color: #1A6E10; }
+.ms-msg.lost { color: #B3261E; }
+.ms-code {
+  width: 100%; margin: 0; padding: 10px 12px; overflow: auto; background: #0C1424; color: #D6E4FF;
+  border: 1px solid #1B2B4A; font: 12px/1.6 var(--mono);
+}
+.ms-code[hidden] { display: none; }

@@ -1,0 +1,33 @@
+/* ---------- Wallpaper (Bliss-like) ---------- */
+.wallpaper {
+  position: fixed; inset: 0 0 var(--taskbar-h) 0; z-index: 0; overflow: hidden; pointer-events: none;
+  background: linear-gradient(#2F6FD6 0%, #6DAEF5 45%, #CFE8FF 72%);
+}
+.hill { position: absolute; left: 0; bottom: 0; width: 100%; height: 55%; }
+.cloud {
+  position: absolute; height: 46px; width: 190px; background: #fff; border-radius: 999px; opacity: .92;
+  box-shadow: 54px -20px 0 -6px #fff, -46px -10px 0 -10px #fff;
+}
+.cloud-a { left: 26%; top: 12%; }
+.cloud-b { right: 14%; top: 26%; transform: scale(.7); }
+
+#desktop { position: fixed; inset: 0 0 var(--taskbar-h) 0; z-index: 1; outline: none; }
+
+/* ---------- Desktop icons ---------- */
+/* Icons sit on a grid and can be dragged (js/shell/desktopIcons.js writes
+   left/top and persists them). On phones they flow in a wrapping row (see
+   responsive.css). */
+.desktop-icons { position: absolute; inset: 0; pointer-events: none; }
+.d-icon { position: absolute; pointer-events: auto; touch-action: none; transition: left .12s ease, top .12s ease; }
+.d-icon.dragging { z-index: 5; opacity: .8; transition: none; cursor: grabbing; }
+.d-icon {
+  width: 84px; display: flex; flex-direction: column; align-items: center; gap: 4px;
+  background: none; border: 1px solid transparent; padding: 6px 2px; cursor: var(--hand);
+  color: #fff; font: 12px/1.2 var(--ui); text-align: center;
+  text-shadow: 1px 1px 2px #000, 0 0 3px #000;
+}
+.d-icon svg { width: 40px; height: 40px; filter: drop-shadow(1px 2px 1.5px rgba(0, 0, 0, .55)); }
+.d-icon span { padding: 1px 3px; overflow-wrap: anywhere; }
+.d-icon span::first-letter { text-transform: uppercase; }
+.d-icon:hover span, .d-icon:focus-visible span { background: var(--select); text-shadow: none; }
+.d-icon:focus-visible { outline: 1px dotted #fff; }

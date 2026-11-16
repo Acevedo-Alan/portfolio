@@ -1,0 +1,19 @@
+/* ---------- Command Prompt ---------- */
+#win-terminal .titlebar { cursor: default; }
+.term-body {
+  background: #000; color: #C0C0C0; font: 14px/1.35 var(--mono); padding: 6px 8px; border-top: 0; cursor: text;
+}
+.term-body::-webkit-scrollbar-track { background: #1a1a1a; border-left-color: #333; }
+.term-log { display: flex; flex-direction: column; gap: 2px; }
+.term-line { white-space: pre-wrap; overflow-wrap: anywhere; }
+.term-line--echo { color: #fff; }
+.cmd-hl { color: #fff; font-weight: 700; }
+.term-line a { color: #8CB4FF; }
+.term-line .k { display: inline-block; min-width: 9ch; color: #fff; }
+.term-input-row { display: flex; align-items: center; gap: 6px; margin-top: 2px; }
+.term-prompt-inline { flex: none; color: #C0C0C0; white-space: pre; }
+.term-typed { color: #fff; }
+.term-input {
+  flex: 1; min-width: 2ch; background: transparent; border: 0; outline: 0; padding: 0;
+  color: #fff; font: inherit; caret-color: #C0C0C0;
+}
