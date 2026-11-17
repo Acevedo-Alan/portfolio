@@ -24,6 +24,11 @@ export function init(apps) {
   translate(list);
 
   button().addEventListener('click', toggle);
+  $('#sm-avatar').addEventListener('click', () => {            // like XP: click your picture to change it
+    close();
+    windows.open('display');
+    bus.emit('display:tab', 'account');
+  });
   $('#close-all').addEventListener('click', () => { windows.closeAll(); close(); play('min'); });
   menu().addEventListener('click', (e) => { if (e.target.closest('a')) close(); });
 

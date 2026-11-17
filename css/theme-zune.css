@@ -1,0 +1,108 @@
+/*
+ * theme-zune.css — the dark "Zune" color scheme (charcoal + orange), selected
+ * in Display Properties. It only overrides colors: layout and sizes are shared
+ * with the Luna theme. Everything is scoped to html[data-theme="zune"].
+ * The Media Player and Bug Sweeper keep their own looks.
+ */
+
+html[data-theme="zune"] {
+  color-scheme: dark;                         /* dark native scrollbars, form controls */
+  --luna-top: #4A4A50; --luna-mid: #34343A; --luna-bot: #222226;
+  --frame: #0E0E10; --frame-off: #2A2A2E; --beige: #26262A;
+  --link: #FF9A57; --select: #F26B21; --balloon: #33333A;
+}
+
+/* ----- windows ----- */
+html[data-theme="zune"] .titlebar { text-shadow: 1px 1px 0 #000; }
+html[data-theme="zune"] .window:not(.active) .titlebar { background: linear-gradient(#3A3A3E, #2A2A2E); color: #D6D6DA; }
+html[data-theme="zune"] .window.active { box-shadow: 0 0 0 1px #F26B21, 4px 8px 22px rgba(0, 0, 0, .7); }
+html[data-theme="zune"] .wb { background: radial-gradient(circle at 30% 25%, #75757D, #3A3A40 70%, #2A2A2E); border-color: #9A9AA2; }
+html[data-theme="zune"] .wb.wb-close { background: radial-gradient(circle at 30% 25%, #FFA56B, #F26B21 70%, #B5460F); }
+html[data-theme="zune"] .win-body { background: #1B1B1E; color: #ECECEC; }
+html[data-theme="zune"] .addr { color: #B6B6BE; border-bottom-color: #3A3A40; }
+html[data-theme="zune"] .addr-box { background: #121214; color: #ECECEC; border-color: #3A3A40; }
+html[data-theme="zune"] .nav-btn:hover:not(:disabled) { background: #34343A; border-color: #55555C; }
+html[data-theme="zune"] .win-body::-webkit-scrollbar-track { background: #1B1B1E; border-left-color: #2A2A2E; }
+html[data-theme="zune"] .win-body::-webkit-scrollbar-thumb { background: linear-gradient(90deg, #55555C, #3A3A40 50%, #55555C); border-color: #1B1B1E; box-shadow: inset 0 0 0 1px #6A6A72; }
+
+/* ----- content surfaces ----- */
+html[data-theme="zune"] .box-subtitle { border-bottom-color: #3A3A40; }
+html[data-theme="zune"] .hero { background: linear-gradient(90deg, #26262A, #5A2A12 140%); }
+html[data-theme="zune"] .hero-role { color: #FFD2B0; }
+html[data-theme="zune"] .info-card,
+html[data-theme="zune"] .exp-item,
+html[data-theme="zune"] .proj-card,
+html[data-theme="zune"] .dm,
+html[data-theme="zune"] .contact-links,
+html[data-theme="zune"] .stack-grid { background: #232326; border-color: #3A3A40; }
+html[data-theme="zune"] .exp-head,
+html[data-theme="zune"] .proj-head { background: linear-gradient(90deg, #2E2E33, #4A2A18); }
+html[data-theme="zune"] .proj-card.featured { border-color: #F26B21; box-shadow: 0 0 0 1px #8A3E14; }
+html[data-theme="zune"] .exp-meta,
+html[data-theme="zune"] .exp-num,
+html[data-theme="zune"] .edu-meta,
+html[data-theme="zune"] .meta-row .label,
+html[data-theme="zune"] .sp-list dt { color: #A8A8B0; }
+html[data-theme="zune"] .exp-meta .org { color: #ECECEC; }
+html[data-theme="zune"] .chip { background: #2E2E33; border-color: #4A4A52; color: #E2E2E6; }
+html[data-theme="zune"] .edu-status { background: #1F3A22; color: #9BE59B; border-color: #3E7B43; }
+html[data-theme="zune"] .contact-links a { color: #ECECEC; }
+html[data-theme="zune"] .contact-links a + a { border-top-color: #3A3A40; }
+html[data-theme="zune"] .dm-cat summary::before { background: #121214; border-color: #6A6A72; color: #ECECEC; }
+html[data-theme="zune"] .dm-cat ul,
+html[data-theme="zune"] .dm-cat li::before { border-color: #55555C; }
+html[data-theme="zune"] .group { border-color: #3A3A40; }
+html[data-theme="zune"] .group legend { color: #FF9A57; }
+
+/* ----- dialogs, tabs, explorer, bin ----- */
+html[data-theme="zune"] .tab-panels { background: #1F1F22; border-color: #3A3A40; }
+html[data-theme="zune"] .tabs [role="tab"] { background: linear-gradient(#34343A, #26262A); color: #D6D6DA; border-color: #3A3A40; }
+html[data-theme="zune"] .tabs [role="tab"][aria-selected="true"] { background: #1F1F22; color: #fff; box-shadow: inset 0 2px 0 #F26B21; }
+html[data-theme="zune"] .ex-tree { background: linear-gradient(#2A2A2E, #18181A); }
+html[data-theme="zune"] .ex-tree h3 { background: linear-gradient(90deg, #3A3A40, #4A2A18); }
+html[data-theme="zune"] .ex-tree > ul { background: #232326; }
+html[data-theme="zune"] .ex-tree ul ul { border-color: #55555C; }
+html[data-theme="zune"] .ex-main { background: #1B1B1E; }
+html[data-theme="zune"] .bin-body, html[data-theme="zune"] .bin-main { background: #1B1B1E; }
+html[data-theme="zune"] .bin-intro { color: #B6B6BE; }
+html[data-theme="zune"] .bin-table { border-color: #3A3A40; }
+html[data-theme="zune"] .bin-table th { background: linear-gradient(#34343A, #26262A); color: #D6D6DA; border-color: #3A3A40; }
+html[data-theme="zune"] .bin-table td { border-bottom-color: #2A2A2E; }
+html[data-theme="zune"] .bin-status, html[data-theme="zune"] .bin-bar { border-color: #3A3A40; color: #D6D6DA; }
+html[data-theme="zune"] .btn-xp { background: linear-gradient(#4A4A50, #34343A 85%, #28282C); color: #ECECEC; border-color: #1B1B1E; }
+html[data-theme="zune"] .btn-xp:disabled { background: #26262A; color: #6A6A72; border-color: #333; }
+html[data-theme="zune"] .btn-xp.principal-d { box-shadow: inset 0 0 0 2px #F26B21; }
+html[data-theme="zune"] .dp-monitor { background: linear-gradient(#3A3A40, #26262A); border-color: #55555C; }
+html[data-theme="zune"] .dp-option:hover { background: rgba(242, 107, 33, .18); }
+html[data-theme="zune"] .dp-option input { accent-color: #F26B21; }
+html[data-theme="zune"] .ms-body, html[data-theme="zune"] .win-body.ms-body { background: #26262A; }
+html[data-theme="zune"] .ms-hint { color: #B6B6BE; }
+
+/* ----- wizards, balloon, menus ----- */
+html[data-theme="zune"] .wiz { background: #1B1B1E; color: #ECECEC; }
+html[data-theme="zune"] .wiz-side { background: linear-gradient(#4A2A18, #F26B21); }
+html[data-theme="zune"] .wiz-field input, html[data-theme="zune"] .wiz-field textarea { background: #121214; color: #ECECEC; border-color: #4A4A52; }
+html[data-theme="zune"] .wiz-error { color: #FF8A80; }
+html[data-theme="zune"] .xp-progress { background: #121214; border-color: #4A4A52; }
+html[data-theme="zune"] .xp-progress i { background: repeating-linear-gradient(90deg, #F26B21 0 8px, transparent 8px 10px); }
+html[data-theme="zune"] .balloon, html[data-theme="zune"] .mascot-bubble { color: #ECECEC; border-color: #F26B21; }
+html[data-theme="zune"] .balloon::after, html[data-theme="zune"] .mascot-bubble::after { border-top-color: #F26B21; }
+html[data-theme="zune"] .ctx-menu { background: #232326; border-color: #55555C; color: #ECECEC; }
+html[data-theme="zune"] .ctx-sep hr { border-top-color: #3A3A40; }
+html[data-theme="zune"] .vol-pop { color: #ECECEC; border-color: #55555C #0E0E10 #0E0E10 #55555C; }
+
+/* ----- taskbar and Start menu ----- */
+html[data-theme="zune"] .taskbar { background: linear-gradient(#3A3A40 0%, #2A2A2E 8%, #1E1E21 100%); border-top-color: #4A4A52; }
+html[data-theme="zune"] .start-btn { background: linear-gradient(#FF9A57 0%, #F26B21 15%, #D9560F 60%, #B5460F 100%); }
+html[data-theme="zune"] .task { background: linear-gradient(#4A4A50, #34343A 90%, #2A2A2E); border-color: #18181A; }
+html[data-theme="zune"] .task.active { background: linear-gradient(#18181A, #232326); box-shadow: inset 1px 1px 3px rgba(0, 0, 0, .7), inset 0 -2px 0 #F26B21; }
+html[data-theme="zune"] .tray { background: linear-gradient(#34343A, #222226); border-left-color: #4A4A52; }
+html[data-theme="zune"] .start-menu { background: #1B1B1E; border-color: #F26B21; }
+html[data-theme="zune"] .sm-head { background: linear-gradient(#4A2A18, #F26B21 140%); }
+html[data-theme="zune"] .sm-body { border-top-color: #F26B21; }
+html[data-theme="zune"] .sm-left { background: #1B1B1E; }
+html[data-theme="zune"] .sm-right { background: #26262A; border-left-color: #3A3A40; }
+html[data-theme="zune"] .sm-body li > button, html[data-theme="zune"] .sm-body li > a { color: #ECECEC; }
+html[data-theme="zune"] .sm-right li > a, html[data-theme="zune"] .sm-right li > button { color: #FFB27F; }
+html[data-theme="zune"] .sm-foot { background: linear-gradient(#34343A, #222226); }
+html[data-theme="zune"] .dp-tile:has(input:checked) { border-color: #F26B21; background: rgba(242, 107, 33, .25); }

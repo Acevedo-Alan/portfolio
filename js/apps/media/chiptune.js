@@ -1,8 +1,8 @@
 /*
- * apps/winamp/chiptune.js — a tiny Web Audio synthesizer + step sequencer.
+ * apps/media/chiptune.js — a tiny Web Audio synthesizer + step sequencer.
  * Plays a track from tracks.js with square/triangle oscillators, a sine kick
  * and a noise hi-hat, scheduled a little ahead of the audio clock so timing
- * stays tight. Exposes an AnalyserNode for the visualizer.
+ * stays tight. Connects to the shared AudioOutput (output.js).
  *
  * Audio only starts from an explicit play() call (a click), which satisfies
  * browser autoplay rules.
@@ -16,9 +16,8 @@ const TICK_MS = 30;         // how often the scheduler runs
 const midiToHz = (midi) => 440 * 2 ** ((midi - 69) / 12);
 
 export class Chiptune {
+  #out;
   #ctx = null;
-  #master = null;
-  #analyser = null;
   #session = null;          // per-play gain node: disconnecting it cuts queued notes on stop
   #noise = null;
   #timer = null;
@@ -26,17 +25,21 @@ export class Chiptune {
   #step = 0;
   #nextTime = 0;
   #startedAt = 0;
-  #volume = 0.7;
+
+  constructor(output) {
+    this.#out = output;
+  }
 
   get playing() { return this.#timer !== null; }
   get track() { return this.#track; }
-  get analyser() { this.#ensure(); return this.#analyser; }
   /** Seconds played of the current track (frozen while paused). */
   get elapsed() { return this.#ctx && this.#track ? Math.max(0, this.#ctx.currentTime - this.#startedAt) : 0; }
 
-  setVolume(volume) {
-    this.#volume = volume;
-    if (this.#master) this.#master.gain.value = volume;
+  /** 0..1 through the track's chord loop (wraps), for a progress bar. */
+  get progress() {
+    if (!this.#track) return 0;
+    const loopSeconds = this.#track.progression.length * 8 * (60 / this.#track.bpm / 4);
+    return (this.elapsed % loopSeconds) / loopSeconds;
   }
 
   async play(track) {
@@ -64,16 +67,7 @@ export class Chiptune {
 
   #ensure() {
     if (this.#ctx) return;
-    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-    this.#ctx = new AudioContextClass();
-    this.#master = this.#ctx.createGain();
-    this.#master.gain.value = this.#volume;
-    this.#analyser = this.#ctx.createAnalyser();
-    this.#analyser.fftSize = 128;
-    this.#analyser.smoothingTimeConstant = 0.8;
-    this.#master.connect(this.#analyser);
-    this.#analyser.connect(this.#ctx.destination);
-
+    this.#ctx = this.#out.ctx;
     const length = Math.floor(this.#ctx.sampleRate * 0.1);
     this.#noise = this.#ctx.createBuffer(1, length, this.#ctx.sampleRate);
     const data = this.#noise.getChannelData(0);
@@ -83,7 +77,7 @@ export class Chiptune {
   #begin(track) {
     if (this.#session) this.#session.disconnect();
     this.#session = this.#ctx.createGain();
-    this.#session.connect(this.#master);
+    this.#session.connect(this.#out.master);
     this.#track = track;
     this.#step = 0;
     this.#nextTime = this.#ctx.currentTime + 0.05;

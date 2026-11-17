@@ -21,3 +21,5 @@
 .dm-cat li { position: relative; padding: 1px 4px 1px 14px; }
 .dm-cat li::before { content: ""; position: absolute; left: 0; top: 50%; width: 10px; border-top: 1px dotted #919B9C; }
 .dm-cat li b { font-weight: 700; }
+.dm-ico { width: 16px; height: 16px; flex: none; margin-right: 4px; vertical-align: -3px; }
+.dm-root { display: flex; align-items: center; }

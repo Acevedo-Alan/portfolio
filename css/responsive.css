@@ -19,4 +19,18 @@
   .ex-tree { padding: 8px; max-height: 40vh; }
   .ex-main { padding: 14px; }
   .rz { display: none; }
+  /* Media Player: single column, tabs become a scrolling row, no curved corners */
+  .window.skin { border-radius: 0; }
+  .window.skin .titlebar, .window.skin:not(.active) .titlebar { padding: 8px 8px 0 14px; }
+  .mp { grid-template-columns: 1fr; grid-template-rows: auto minmax(0, 1fr); }
+  .mp-side { flex-direction: row; flex-wrap: wrap; gap: 4px; padding: 6px 10px 0; }
+  .mp-tab { padding: 6px 10px; border-radius: 14px; font-size: 12px; }
+  .mp-side-tools { margin: 0 0 0 auto; }
+  .mp-stage { padding: 6px 0 0 0; }
+  .mp-screen { margin: 0 10px; min-height: 90px; }
+  .mp-info { padding: 8px 12px 0; }
+  .mp-tracks { margin: 6px 12px 32px; }
+  .mp-deck { padding: 8px 12px 12px; }
+  .mp-vol-wrap { margin-left: 4px; }
+  .mp-vol { width: 64px; }
 }

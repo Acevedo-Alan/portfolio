@@ -1,0 +1,3 @@
+# Real audio for the Media Player (js/apps/media/library.js). Kept out of git so a copyrighted
+# recording is never published by accident; remove this line only for audio you have the rights to publish.
+music/*.mp3

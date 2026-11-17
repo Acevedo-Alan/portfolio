@@ -1,0 +1,19 @@
+/* ---------- Wizard dialogs (CD burning, dial-up) ---------- */
+.xp-backdrop { position: fixed; inset: 0; z-index: 9800; display: grid; place-items: center; padding: 12px; background: rgba(0, 0, 30, .38); }
+.window.xp-modal { position: relative; left: auto; top: auto; z-index: auto; width: min(520px, 100%); height: auto; animation: win-pop .16s ease-out; }
+.wiz { display: flex; min-height: 220px; background: #fff; color: #000; }
+.wiz-side { flex: none; width: 128px; display: grid; place-items: center; background: linear-gradient(#2D62C8, #7DA4EF); }
+.wiz-side svg, .wiz-side img { width: 76px; height: 76px; filter: drop-shadow(2px 3px 3px rgba(0, 0, 0, .4)); }
+.wiz-main { flex: 1; min-width: 0; padding: 18px 20px 14px; }
+.wiz-h { margin: 0 0 10px; font: 700 15px/1.3 var(--title); color: var(--link); }
+.wiz-body p { line-height: 1.7; margin-bottom: 8px; }
+.wiz-field { display: grid; gap: 3px; margin-bottom: 8px; font-size: 12px; }
+.wiz-field input, .wiz-field textarea {
+  width: 100%; padding: 4px 6px; font: 13px/1.4 var(--ui); color: #000; background: #fff; border: 1px solid #7F9DB9; border-radius: 2px; resize: vertical;
+}
+.wiz-field input:focus-visible, .wiz-field textarea:focus-visible { outline: 2px solid #316AC5; outline-offset: 0; }
+.wiz-error { min-height: 1.4em; color: #B3261E; font-weight: 700; font-size: 12px; }
+.wiz-buttons { display: flex; justify-content: flex-end; gap: 8px; padding: 10px 14px; background: var(--beige); border-top: 1px solid #ACA899; }
+.xp-progress { height: 20px; margin-top: 14px; padding: 2px; background: #fff; border: 1px solid #686868; border-radius: 3px; overflow: hidden; }
+.xp-progress i { display: block; width: 0; height: 100%; border-radius: 2px; background: repeating-linear-gradient(90deg, #2FC52F 0 8px, transparent 8px 10px); transition: width .1s linear; }
+@media (max-width: 520px) { .wiz-side { display: none; } }

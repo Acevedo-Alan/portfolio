@@ -24,10 +24,14 @@ html.app-failed .start-menu,
 html.app-failed .mascot,
 html.app-failed .balloon,
 html.app-failed .skip-link,
+html.app-failed .welcome,
 html.app-failed #win-terminal,
 html.app-failed #win-bugsweeper,
-html.app-failed #win-winamp,
-html.app-failed #win-papelera { display: none; }
+html.app-failed #win-music,
+html.app-failed #win-papelera,
+html.app-failed #win-display,
+html.app-failed .vol-pop,
+html.app-failed .ctx-menu { display: none; }
 
 /* Content windows become stacked cards */
 html.app-failed #desktop { position: static; max-width: 860px; margin: 0 auto; padding: 16px; }

@@ -28,6 +28,7 @@ export function mount() {
       const active = node.dataset.proj === selected;
       node.classList.toggle('active', active);
       if (active) node.setAttribute('aria-current', 'true'); else node.removeAttribute('aria-current');
+      node.querySelector('img').src = `imgs/xp-icons/${active ? 'folder-opened' : 'folder-closed'}.png`;
     });
     cards.forEach((card) => { card.hidden = selected !== 'all' && card.dataset.proj !== selected; });
     windows.setPath('proyectos', ROOT + (FOLDER_NAMES[selected] ? '\\' + FOLDER_NAMES[selected] : ''));

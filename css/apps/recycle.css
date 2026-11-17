@@ -10,10 +10,7 @@
 }
 .bin-table td { padding: 5px 10px; vertical-align: top; border-bottom: 1px solid #F0EFE6; }
 .bin-table td:first-child { font-family: var(--mono); font-size: 12px; white-space: nowrap; }
-.bin-table td:first-child::before {
-  content: ""; display: inline-block; width: 12px; height: 14px; margin-right: 6px; vertical-align: -2px;
-  background: linear-gradient(#fff, #D5DAE6); border: 1px solid #7F8FAF; border-radius: 1px;
-}
+.bin-ico { width: 16px; height: 16px; margin-right: 6px; vertical-align: -3px; }
 .bin-table tr:hover td { background: var(--select); color: #fff; }
 .bin-empty { padding: 40px 12px; text-align: center; color: #555; }
 .bin-status { flex: none; padding: 3px 10px; background: var(--beige); border-top: 1px solid #fff; font-size: 12px; color: #222; }

@@ -48,14 +48,19 @@
 <link rel="stylesheet" href="css/window.css">
 <link rel="stylesheet" href="css/taskbar.css">
 <link rel="stylesheet" href="css/mascot.css">
+<link rel="stylesheet" href="css/modal.css">
+<link rel="stylesheet" href="css/welcome.css">
+<link rel="stylesheet" href="css/contextmenu.css">
 <link rel="stylesheet" href="css/content.css">
 <link rel="stylesheet" href="css/apps/sysprops.css">
 <link rel="stylesheet" href="css/apps/explorer.css">
 <link rel="stylesheet" href="css/apps/devmanager.css">
 <link rel="stylesheet" href="css/apps/terminal.css">
 <link rel="stylesheet" href="css/apps/minesweeper.css">
-<link rel="stylesheet" href="css/apps/winamp.css">
+<link rel="stylesheet" href="css/apps/player.css">
 <link rel="stylesheet" href="css/apps/recycle.css">
+<link rel="stylesheet" href="css/apps/display.css">
+<link rel="stylesheet" href="css/theme-zune.css">
 <link rel="stylesheet" href="css/responsive.css">
 <link rel="stylesheet" href="css/fallback.css">
 <!-- Boot guard: if the app can't start (opened from file://, where browsers
@@ -68,7 +73,18 @@
     var root = document.documentElement;
     function fail() { if (!root.classList.contains('app-ready')) root.classList.add('app-failed'); }
     if (location.protocol === 'file:') fail();
+    // Apply the saved wallpaper/theme before first paint so there is no flash of the default look.
+    try {
+      var wp = localStorage.getItem('portfolio-wallpaper');
+      var th = localStorage.getItem('portfolio-xp-theme');
+      if (/^(bliss|autumn|azul|moon)$/.test(wp)) root.dataset.wallpaper = wp;
+      if (/^(luna|zune)$/.test(th)) root.dataset.theme = th;
+    } catch (e) { /* storage unavailable */ }
     window.addEventListener('error', fail);
+    // Show the XP welcome screen once per browser session (skip with ?skip). It needs sessionStorage + http(s).
+    try {
+      if (location.protocol !== 'file:' && !sessionStorage.getItem('portfolio-welcomed') && !/[?&]skip\b/.test(location.search)) root.classList.add('welcome-pending');
+    } catch (e) { /* no sessionStorage: skip the welcome screen */ }
   })();
 </script>
 <!-- ES modules (deferred by default). Needs http(s): serve the folder, e.g. `npx serve` -->
@@ -77,6 +93,27 @@
 <body>
 
 <a href="#desktop" class="skip-link" data-i18n="skip-link">Saltar al escritorio</a>
+
+<!-- XP welcome screen: shown while <html class="welcome-pending"> (set by the boot guard in <head>;
+     js/shell/welcome.js clears it when the visitor clicks their user name). Text is translated like the rest. -->
+<div class="welcome" id="welcome" role="dialog" aria-modal="true" aria-labelledby="ws-title">
+  <div class="ws-top" aria-hidden="true"></div>
+  <div class="ws-main">
+    <div class="ws-left">
+      <div class="ws-brand"><svg aria-hidden="true" focusable="false"><use href="#i-flag"/></svg><span id="ws-title" data-i18n="ws-title">Portfolio</span></div>
+      <p class="ws-sub">Alan Acevedo · Full Stack Developer</p>
+      <p class="ws-hint" data-i18n="ws-hint">Para comenzar, hacé clic en tu nombre de usuario.</p>
+    </div>
+    <div class="ws-divider" aria-hidden="true"></div>
+    <div class="ws-right">
+      <button type="button" class="ws-user" id="ws-user" data-i18n-label="ws-user-label" aria-label="Iniciar sesión como Alan Acevedo">
+        <span class="ws-tile" aria-hidden="true"></span><span class="ws-name">Alan Acevedo</span>
+      </button>
+      <p class="ws-loading" id="ws-loading" role="status" hidden data-i18n="ws-loading">Cargando tu configuración personal…</p>
+    </div>
+  </div>
+  <div class="ws-bottom" aria-hidden="true"></div>
+</div>
 
 <!-- Shown only when the app fails to start (see the boot guard in <head>); text is
      hardcoded in both languages because the i18n modules may not have loaded. -->
@@ -89,94 +126,20 @@
      with <use>. -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
   <defs>
-    <linearGradient id="g-blue" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7DB3FF"/><stop offset="1" stop-color="#1F55D6"/></linearGradient>
-    <linearGradient id="g-yellow" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFE98A"/><stop offset="1" stop-color="#E8B21E"/></linearGradient>
-    <linearGradient id="g-green" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8EE06A"/><stop offset="1" stop-color="#2E9A2E"/></linearGradient>
-    <linearGradient id="g-gray" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F4F4F0"/><stop offset="1" stop-color="#B7B5A6"/></linearGradient>
-    <linearGradient id="g-brown" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#D9A05B"/><stop offset="1" stop-color="#8C5A24"/></linearGradient>
-    <linearGradient id="g-navgreen" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9BE37A"/><stop offset="1" stop-color="#2E9A2E"/></linearGradient>
   </defs>
 
-  <symbol id="i-user" viewBox="0 0 32 32">
-    <rect x="2" y="2" width="28" height="28" rx="4" fill="url(#g-blue)" stroke="#173E9E"/>
-    <circle cx="16" cy="12" r="5.5" fill="#FFE0B8" stroke="#8A5A2B"/>
-    <path d="M5 29c0-7 5-11 11-11s11 4 11 11z" fill="#fff" stroke="#173E9E"/>
-  </symbol>
-  <symbol id="i-gear" viewBox="0 0 32 32">
-    <circle cx="16" cy="16" r="10" fill="none" stroke="#6E7B8F" stroke-width="6" stroke-dasharray="3.2 3.2"/>
-    <circle cx="16" cy="16" r="9" fill="url(#g-gray)" stroke="#5C6A80" stroke-width="1.5"/>
-    <circle cx="16" cy="16" r="4" fill="#3168D5" stroke="#173E9E"/>
-  </symbol>
-  <symbol id="i-case" viewBox="0 0 32 32">
-    <path d="M11 9V6h10v3" fill="none" stroke="#5A3A16" stroke-width="2"/>
-    <rect x="2" y="9" width="28" height="19" rx="3" fill="url(#g-brown)" stroke="#5A3A16"/>
-    <rect x="2" y="16" width="28" height="2" fill="#5A3A16" opacity=".5"/>
-    <rect x="14" y="14" width="4" height="6" rx="1" fill="#F2D27A" stroke="#5A3A16"/>
-  </symbol>
-  <symbol id="i-folder" viewBox="0 0 32 32">
-    <path d="M2 8a2 2 0 0 1 2-2h7l3 3h14a2 2 0 0 1 2 2v15a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2z" fill="url(#g-yellow)" stroke="#A9780E"/>
-    <path d="M2 13h28" stroke="#fff" stroke-opacity=".6"/>
-  </symbol>
-  <symbol id="i-cap" viewBox="0 0 32 32">
-    <path d="M16 5 30 12 16 19 2 12z" fill="url(#g-blue)" stroke="#173E9E"/>
-    <path d="M8 16v6c0 2 4 4 8 4s8-2 8-4v-6l-8 4z" fill="#2B4FB8" stroke="#173E9E"/>
-    <path d="M28 13v8" stroke="#E8B21E" stroke-width="2"/>
-  </symbol>
-  <symbol id="i-mail" viewBox="0 0 32 32">
-    <rect x="2" y="6" width="28" height="20" rx="2" fill="#fff" stroke="#5C6A80"/>
-    <path d="M3 8l13 10L29 8" fill="none" stroke="#3168D5" stroke-width="2"/>
-  </symbol>
-  <symbol id="i-term" viewBox="0 0 32 32">
-    <rect x="2" y="4" width="28" height="24" rx="2" fill="#000" stroke="#5C6A80" stroke-width="1.5"/>
-    <rect x="2" y="4" width="28" height="5" rx="2" fill="url(#g-blue)"/>
-    <path d="M7 14l4 3-4 3" fill="none" stroke="#C0C0C0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M13 21h6" stroke="#C0C0C0" stroke-width="1.8" stroke-linecap="round"/>
-  </symbol>
   <symbol id="i-flag" viewBox="0 0 32 32">
     <path d="M3 6c4-2 7-2 11 0v9c-4-2-7-2-11 0z" fill="#F35325"/>
     <path d="M16 7c4 2 8 2 12 0v9c-4 2-8 2-12 0z" fill="#81BC06"/>
     <path d="M3 17c4-2 7-2 11 0v9c-4-2-7-2-11 0z" fill="#05A6F0"/>
     <path d="M16 18c4 2 8 2 12 0v9c-4 2-8 2-12 0z" fill="#FFBA08"/>
   </symbol>
-  <symbol id="i-sound" viewBox="0 0 16 16">
-    <path d="M2 6h3l4-3v10l-4-3H2z" fill="#fff"/>
-    <path class="snd-on" d="M11 5.5a3.5 3.5 0 0 1 0 5M12.8 3.5a6.3 6.3 0 0 1 0 9" fill="none" stroke="#fff" stroke-width="1.3" stroke-linecap="round"/>
-    <path class="snd-off" d="M11 5.5l4 5m0-5l-4 5" fill="none" stroke="#FF8A7A" stroke-width="1.5" stroke-linecap="round"/>
-  </symbol>
-  <symbol id="i-info" viewBox="0 0 16 16">
-    <circle cx="8" cy="8" r="7" fill="#3168D5" stroke="#fff" stroke-width="1"/>
-    <rect x="7" y="7" width="2" height="5" fill="#fff"/><circle cx="8" cy="4.8" r="1.2" fill="#fff"/>
-  </symbol>
-  <symbol id="i-bug" viewBox="0 0 32 32">
-    <path d="M6 10l5 4M26 10l-5 4M4 17h7M28 17h-7M6 25l5-4M26 25l-5-4" stroke="#222" stroke-width="2" stroke-linecap="round" fill="none"/>
-    <ellipse cx="16" cy="18" rx="8" ry="10" fill="#E53935" stroke="#7F1D1D"/>
-    <path d="M16 8v20" stroke="#222"/>
-    <circle cx="16" cy="8" r="4" fill="#222"/>
-    <circle cx="12" cy="15" r="1.8" fill="#222"/><circle cx="20" cy="15" r="1.8" fill="#222"/>
-    <circle cx="12" cy="22" r="1.8" fill="#222"/><circle cx="20" cy="22" r="1.8" fill="#222"/>
-  </symbol>
-  <symbol id="i-bin" viewBox="0 0 32 32">
-    <path d="M9 9h14l-1.5 19h-11z" fill="url(#g-gray)" stroke="#5C6A80"/>
-    <rect x="7" y="6" width="18" height="3" rx="1" fill="#C9D2E3" stroke="#5C6A80"/>
-    <path d="M12 12v13M20 12v13" stroke="#8C9AB5"/>
-    <path d="M16 13l4 6h-8z" fill="#2E9A2E" stroke="#1F6E12" stroke-linejoin="round"/>
-  </symbol>
-  <symbol id="i-amp" viewBox="0 0 32 32">
-    <rect x="3" y="3" width="26" height="26" rx="4" fill="#2A2A2A" stroke="#000"/>
-    <path d="M18 5l-8 13h6l-2 9 9-14h-6z" fill="#3CFF3C" stroke="#0A8A0A" stroke-linejoin="round"/>
-  </symbol>
-  <symbol id="i-nav-back" viewBox="0 0 24 24">
-    <circle cx="12" cy="12" r="10.5" fill="url(#g-navgreen)" stroke="#2E7D2E"/>
-    <path d="M13.5 6.5 8 12l5.5 5.5v-3.2H18v-4.6h-4.5z" fill="#fff"/>
-  </symbol>
-  <symbol id="i-nav-fwd" viewBox="0 0 24 24">
-    <circle cx="12" cy="12" r="10.5" fill="url(#g-navgreen)" stroke="#2E7D2E"/>
-    <path d="M10.5 6.5 16 12l-5.5 5.5v-3.2H6v-4.6h4.5z" fill="#fff"/>
-  </symbol>
-  <symbol id="i-nav-up" viewBox="0 0 24 24">
-    <circle cx="12" cy="12" r="10.5" fill="url(#g-blue)" stroke="#173E9E"/>
-    <path d="M12 5.5 17.5 11h-3.2v6.5H9.7V11H6.5z" fill="#fff"/>
-  </symbol>
+  <!-- XP "selected icon" look: the icon blended with the selection blue, clipped to its own shape -->
+  <filter id="f-select" color-interpolation-filters="sRGB">
+    <feFlood flood-color="#316AC5" flood-opacity=".6" result="blue"/>
+    <feComposite in="blue" in2="SourceAlpha" operator="in" result="tint"/>
+    <feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="tint"/></feMerge>
+  </filter>
 </svg>
 
 <!-- Wallpaper: Bliss-like sky and hill -->
@@ -185,8 +148,8 @@
   <div class="cloud cloud-b"></div>
   <svg class="hill" viewBox="0 0 1600 500" preserveAspectRatio="none" focusable="false">
     <defs>
-      <linearGradient id="g-hill-a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8FE04A"/><stop offset="1" stop-color="#2F8E1B"/></linearGradient>
-      <linearGradient id="g-hill-b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6CCB36"/><stop offset="1" stop-color="#1F6E12"/></linearGradient>
+      <linearGradient id="g-hill-a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--hill-a1)"/><stop offset="1" style="stop-color:var(--hill-a2)"/></linearGradient>
+      <linearGradient id="g-hill-b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--hill-b1)"/><stop offset="1" style="stop-color:var(--hill-b2)"/></linearGradient>
     </defs>
     <path d="M0 260C300 120 700 130 1000 210S1450 230 1600 150V500H0z" fill="url(#g-hill-b)"/>
     <path d="M0 360C250 250 600 250 900 320S1400 380 1600 300V500H0z" fill="url(#g-hill-a)"/>
@@ -275,17 +238,17 @@
         <button type="button" class="btn-xp" id="dm-collapse" data-i18n="dm-collapse"></button>
       </div>
       <div class="dm" id="dm">
-        <div class="dm-root">ALAN-PC</div>
-        <details class="dm-cat" open><summary>frontend</summary><ul>
+        <div class="dm-root"><img class="dm-ico" src="imgs/xp-icons/my-computer.png" alt="" aria-hidden="true" draggable="false">ALAN-PC</div>
+        <details class="dm-cat" open><summary><img class="dm-ico" src="imgs/xp-icons/internet-explorer-6.png" alt="" aria-hidden="true" draggable="false">frontend</summary><ul>
           <li><b>React</b></li><li><b>Angular</b></li><li>HTML5</li><li>CSS3</li><li>Tailwind CSS</li><li>Bootstrap</li><li>PWA</li><li>IndexedDB</li>
         </ul></details>
-        <details class="dm-cat" open><summary>backend</summary><ul>
+        <details class="dm-cat" open><summary><img class="dm-ico" src="imgs/xp-icons/internet-information-services-6.png" alt="" aria-hidden="true" draggable="false">backend</summary><ul>
           <li><b>Java</b></li><li><b>Spring Boot</b></li><li><b>Spring Security</b></li><li>Node.js</li><li>JWT</li><li><b>REST APIs</b></li><li><b>Server-Sent Events</b></li><li>HMAC / Session Security</li><li>Rate Limiting</li>
         </ul></details>
-        <details class="dm-cat" open><summary>mobile</summary><ul><li>React Native</li><li>Figma</li></ul></details>
-        <details class="dm-cat" open><summary>data</summary><ul><li>PostgreSQL</li><li>MySQL</li><li>MySQL Workbench</li><li>DBeaver</li></ul></details>
-        <details class="dm-cat" open><summary>testing</summary><ul><li>JUnit 5</li><li>Mockito</li></ul></details>
-        <details class="dm-cat" open><summary>tools</summary><ul><li>Git</li><li>GitHub</li><li>CI/CD</li><li>Docker</li><li>Nginx</li><li>Postman</li><li>Jira</li><li>Scrum</li></ul></details>
+        <details class="dm-cat" open><summary><img class="dm-ico" src="imgs/xp-icons/mobile-device.png" alt="" aria-hidden="true" draggable="false">mobile</summary><ul><li>React Native</li><li>Figma</li></ul></details>
+        <details class="dm-cat" open><summary><img class="dm-ico" src="imgs/xp-icons/odbc-data-sources.png" alt="" aria-hidden="true" draggable="false">data</summary><ul><li>PostgreSQL</li><li>MySQL</li><li>MySQL Workbench</li><li>DBeaver</li></ul></details>
+        <details class="dm-cat" open><summary><img class="dm-ico" src="imgs/xp-icons/checklist.png" alt="" aria-hidden="true" draggable="false">testing</summary><ul><li>JUnit 5</li><li>Mockito</li></ul></details>
+        <details class="dm-cat" open><summary><img class="dm-ico" src="imgs/xp-icons/services.png" alt="" aria-hidden="true" draggable="false">tools</summary><ul><li>Git</li><li>GitHub</li><li>CI/CD</li><li>Docker</li><li>Nginx</li><li>Postman</li><li>Jira</li><li>Scrum</li></ul></details>
       </div>
     </div>
   </section>
@@ -345,10 +308,10 @@
         <h3 data-i18n="ex-folders"></h3>
         <ul>
           <li>
-            <button type="button" class="ex-node active" data-proj="all" aria-current="true"><svg aria-hidden="true" focusable="false"><use href="#i-folder"/></svg><span data-i18n="box-proyectos"></span></button>
+            <button type="button" class="ex-node active" data-proj="all" aria-current="true"><img src="imgs/xp-icons/folder-opened.png" alt="" aria-hidden="true" draggable="false"><span data-i18n="box-proyectos"></span></button>
             <ul>
-              <li><button type="button" class="ex-node" data-proj="hexa"><svg aria-hidden="true" focusable="false"><use href="#i-folder"/></svg><span>HEXA</span></button></li>
-              <li><button type="button" class="ex-node" data-proj="lana"><svg aria-hidden="true" focusable="false"><use href="#i-folder"/></svg><span>Lana &amp; Lino</span></button></li>
+              <li><button type="button" class="ex-node" data-proj="hexa"><img src="imgs/xp-icons/folder-closed.png" alt="" aria-hidden="true" draggable="false"><span>HEXA</span></button></li>
+              <li><button type="button" class="ex-node" data-proj="lana"><img src="imgs/xp-icons/folder-closed.png" alt="" aria-hidden="true" draggable="false"><span>Lana &amp; Lino</span></button></li>
             </ul>
           </li>
         </ul>
@@ -431,8 +394,9 @@
 
   <!-- Interactive apps: their content is rendered by the matching module in js/apps/ -->
   <section id="win-bugsweeper"><div class="win-body ms-body"></div></section>
-  <section id="win-winamp"><div class="win-body wa-body"></div></section>
+  <section id="win-music"><div class="win-body mp-body"></div></section>
   <section id="win-papelera"><div class="win-body bin-body"></div></section>
+  <section id="win-display"><div class="win-body sp-body dp-body"></div></section>
 
 </main>
 
@@ -461,7 +425,7 @@
 <!-- Welcome balloon (tray notification) -->
 <div class="balloon" id="balloon" role="status" hidden>
   <div class="balloon-head">
-    <svg class="balloon-ico" aria-hidden="true" focusable="false"><use href="#i-info"/></svg>
+    <img class="balloon-ico" src="imgs/xp-icons/information.png" alt="" aria-hidden="true" draggable="false">
     <strong id="balloon-title" data-i18n="welcome-title">Bienvenido</strong>
     <button type="button" class="balloon-x" id="balloon-x" data-i18n-label="win-close" aria-label="Cerrar">×</button>
   </div>
@@ -471,7 +435,7 @@
 <!-- Start menu -->
 <div class="start-menu" id="start-menu" role="menu" data-i18n-label="start-menu" hidden>
   <div class="sm-head">
-    <div class="sm-avatar" aria-hidden="true"><svg><use href="#i-user"/></svg></div>
+    <button type="button" class="sm-avatar" id="sm-avatar" data-i18n-label="sm-avatar-label" aria-label="Cambiar la imagen de usuario" title="Cambiar la imagen de usuario"></button>
     <strong>Alan Acevedo</strong>
   </div>
   <div class="sm-body">
@@ -488,6 +452,13 @@
   </div>
 </div>
 
+<!-- Tray volume popup: slider + mute, drives the master volume (js/audio/volume.js) -->
+<div class="vol-pop" id="vol-pop" role="dialog" aria-labelledby="vol-pop-title" hidden>
+  <strong id="vol-pop-title" data-i18n="tray-volume">Volumen</strong>
+  <div class="vol-slider"><input type="range" id="vol-range" min="0" max="100" value="80" data-i18n-label="tray-volume" aria-label="Volumen"></div>
+  <label class="vol-mute"><input type="checkbox" id="vol-mute"> <span data-i18n="vol-mute">Silenciar</span></label>
+</div>
+
 <!-- Taskbar -->
 <footer class="taskbar" data-i18n-label="taskbar-label" aria-label="Barra de tareas">
   <button type="button" class="start-btn" id="start-btn" aria-haspopup="menu" aria-expanded="false" aria-controls="start-menu">
@@ -501,8 +472,11 @@
       <span class="lang-sep" aria-hidden="true">/</span>
       <button id="btn-en" type="button" aria-pressed="false" aria-label="Switch to English">EN</button>
     </div>
-    <button type="button" class="tray-btn" id="sound-btn" aria-pressed="false" aria-label="Silenciar sonidos" title="Silenciar sonidos">
-      <svg aria-hidden="true" focusable="false"><use href="#i-sound"/></svg>
+    <button type="button" class="tray-btn" id="net-btn" data-i18n-label="tray-network" aria-label="Conexión de acceso telefónico" title="Conexión de acceso telefónico">
+      <img src="imgs/xp-icons/dial-up-connection.png" alt="" aria-hidden="true" draggable="false">
+    </button>
+    <button type="button" class="tray-btn" id="sound-btn" aria-haspopup="dialog" aria-expanded="false" aria-controls="vol-pop" data-i18n-label="tray-volume" aria-label="Volumen" title="Volumen">
+      <img src="imgs/xp-icons/volume.png" alt="" aria-hidden="true" draggable="false">
     </button>
     <time class="clock" id="clock"></time>
   </div>

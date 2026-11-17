@@ -13,7 +13,7 @@ import * as bus from '../core/bus.js';
 import { translate } from '../i18n/i18n.js';
 import { play } from '../audio/sounds.js';
 
-const CONTROLS = { normal: ['min', 'max', 'close'], fixed: ['min', 'close'], dialog: ['close'] };
+const CONTROLS = { normal: ['min', 'max', 'close'], fixed: ['min', 'close'], skin: ['min', 'close'], dialog: ['close'] };
 const MIN_W = 300;
 const MIN_H = 180;
 const FIRST_WINDOW_LEFT = 210;   // clears the desktop icon columns
@@ -125,7 +125,7 @@ function controlButton(act) {
 
 function navButtons() {
   return '<div class="addr-nav">'
-    + [['back', 'i-nav-back'], ['forward', 'i-nav-fwd'], ['up', 'i-nav-up']]
+    + [['back', 'back'], ['forward', 'forward'], ['up', 'up']]
       .map(([dir, sym]) => `<button type="button" class="nav-btn" data-nav="${dir}" data-i18n-label="nav-${dir}">${icon(sym)}</button>`)
       .join('')
     + '</div>';
@@ -149,7 +149,7 @@ function build(app) {
     const addr = document.createElement('div');
     addr.className = 'addr';
     addr.innerHTML = (app.nav ? navButtons() : '')
-      + `<span data-i18n="addr-label"></span><div class="addr-box" id="addr-${app.id}">${icon('i-folder')}<span>C:\\Portfolio\\${app.id}</span></div>`;
+      + `<span data-i18n="addr-label"></span><div class="addr-box" id="addr-${app.id}">${icon('folder-closed')}<span>C:\\Portfolio\\${app.id}</span></div>`;
     bar.after(addr);
   }
 

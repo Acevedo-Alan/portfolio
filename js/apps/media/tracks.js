@@ -1,5 +1,5 @@
 /*
- * apps/winamp/tracks.js — the playlist, as data. Each track is a chord
+ * apps/media/tracks.js — the playlist, as data. Each track is a chord
  * progression (8 sixteenth-note steps per chord) plus an arpeggio and a drum
  * pattern; notesAt() turns (track, step) into the notes to play. No audio
  * code here, so tracks are easy to add and to test.

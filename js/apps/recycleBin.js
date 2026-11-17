@@ -5,10 +5,13 @@
  * small easter egg.
  */
 
-import { $, escapeHTML } from '../core/dom.js';
+import { $, escapeHTML, icon } from '../core/dom.js';
 import * as bus from '../core/bus.js';
 import { t, dict, translate } from '../i18n/i18n.js';
 import { play } from '../audio/sounds.js';
+
+const FILE_ICONS = { js: 'java-script', json: 'generic-text-document' };   // everything else: generic-document
+const fileIcon = (name) => FILE_ICONS[name.split('.').pop()] || 'generic-document';
 
 export function mount() {
   const root = $('#win-papelera .bin-body');
@@ -19,7 +22,7 @@ export function mount() {
     const columns = dict()['bin-cols'];
 
     const table = `<table class="bin-table"><thead><tr>${columns.map((c) => `<th scope="col">${escapeHTML(c)}</th>`).join('')}</tr></thead>`
-      + `<tbody>${items.map((row) => `<tr>${row.map((cell) => `<td>${escapeHTML(cell)}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+      + `<tbody>${items.map((row) => `<tr>${row.map((cell, i) => `<td>${i === 0 ? icon(fileIcon(cell), 'bin-ico') : ''}${escapeHTML(cell)}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
 
     root.innerHTML = `
       <div class="bin-bar">

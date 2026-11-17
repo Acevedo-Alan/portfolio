@@ -19,6 +19,10 @@ import * as windows from './shell/windowManager.js';
 import * as desktopIcons from './shell/desktopIcons.js';
 import * as startMenu from './shell/startMenu.js';
 import * as taskbar from './shell/taskbar.js';
+import * as tray from './shell/tray.js';
+import * as contextMenu from './shell/contextMenu.js';
+import * as appearance from './shell/appearance.js';
+import * as welcome from './shell/welcome.js';
 import * as balloon from './shell/balloon.js';
 import * as mascot from './shell/mascot.js';
 
@@ -27,8 +31,9 @@ import { mount as mountDeviceManager } from './apps/deviceManager.js';
 import { mount as mountExplorer } from './apps/explorer.js';
 import { mount as mountTerminal } from './apps/terminal.js';
 import { mount as mountBugSweeper } from './apps/minesweeper/ui.js';
-import { mount as mountWinamp } from './apps/winamp/ui.js';
+import { mount as mountMediaPlayer } from './apps/media/ui.js';
 import { mount as mountRecycleBin } from './apps/recycleBin.js';
+import { mount as mountDisplayProps } from './apps/displayProps.js';
 
 // App id -> its mount function. Static-content windows (experiencia,
 // educacion, contacto) need none.
@@ -38,15 +43,19 @@ const MOUNTS = {
   proyectos: mountExplorer,
   terminal: mountTerminal,
   bugsweeper: mountBugSweeper,
-  winamp: mountWinamp,
+  music: mountMediaPlayer,
   papelera: mountRecycleBin,
+  display: mountDisplayProps,
 };
 
-// 1. Build the shell (windows, icons, menus, taskbar).
+// 1. Build the shell (windows, icons, menus, taskbar, tray).
+appearance.init();
 windows.init(APPS);
 desktopIcons.init(APPS);
 startMenu.init(APPS);
 taskbar.init();
+tray.init();
+contextMenu.init();
 balloon.init();
 
 // 2. Set the language (translates the shell and notifies listeners), then
@@ -54,8 +63,10 @@ balloon.init();
 initLang();
 APPS.forEach((app) => { if (MOUNTS[app.id]) MOUNTS[app.id](); });
 
-// 3. Start.
-playStartupOnFirstGesture();
+// 3. Start. The welcome screen (first visit of a session) waits for a click on the user name and plays
+//    the startup chime itself; otherwise the chime waits for the first click or keypress.
+const welcomed = await welcome.run();
+if (!welcomed) playStartupOnFirstGesture();
 mascot.init();
 
 // Deep links (e.g. /#contacto) open that window; otherwise start on "about me".

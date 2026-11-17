@@ -1,0 +1,29 @@
+/* ---------- Display Properties ---------- */
+.dp-monitor {
+  width: 196px; margin: 4px auto 14px; padding: 12px 12px 22px; border: 1px solid #716F64; border-radius: 8px 8px 4px 4px;
+  background: linear-gradient(#EDEAD9, #C8C3AC); box-shadow: 0 3px 6px rgba(0, 0, 0, .3); position: relative;
+}
+.dp-monitor::after { content: ""; position: absolute; left: 50%; bottom: 6px; width: 28px; height: 5px; margin-left: -14px; border-radius: 3px; background: #8D8A78; }
+.dp-screen, .dp-swatch[data-wallpaper] { background:
+  radial-gradient(ellipse 90% 55% at 25% 108%, var(--hill-b1) 0 62%, transparent 63%),
+  radial-gradient(ellipse 100% 50% at 82% 115%, var(--hill-a1) 0 62%, transparent 63%),
+  linear-gradient(var(--sky-a), var(--sky-c)); }
+.dp-screen { height: 108px; border: 2px solid #1B1B1B; border-radius: 3px; }
+.dp-list { display: grid; gap: 4px; }
+.dp-option { display: flex; align-items: center; gap: 8px; padding: 3px 4px; cursor: var(--hand); }
+.dp-option span:last-child::first-letter { text-transform: uppercase; }
+.dp-option:hover { background: rgba(49, 106, 197, .15); }
+.dp-option input { margin: 0; accent-color: #316AC5; }
+.dp-swatch { width: 40px; height: 26px; border: 1px solid #5C6A80; border-radius: 2px; flex: none; }
+.dp-swatch[data-swatch="luna"] { background: linear-gradient(#0997FF, #0053EE 40%, #003DD7); }
+.dp-swatch[data-swatch="zune"] { background: linear-gradient(90deg, #26262A 0 60%, #F26B21 60%); }
+.dp-body .tab-panels { overflow: auto; }
+
+/* Account tab: the XP user pictures */
+.dp-tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.dp-tile { position: relative; display: block; padding: 3px; border: 2px solid transparent; border-radius: 6px; cursor: var(--hand); }
+.dp-tile input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: inherit; }
+.dp-tile span { display: block; aspect-ratio: 1; background-size: cover; background-position: center; border: 1px solid #5C6A80; border-radius: 4px; }
+.dp-tile:hover { background: rgba(49, 106, 197, .15); }
+.dp-tile:has(input:checked) { border-color: #316AC5; background: rgba(49, 106, 197, .25); }
+.dp-tile:has(input:focus-visible) { outline: 1px dotted #000; outline-offset: 1px; }

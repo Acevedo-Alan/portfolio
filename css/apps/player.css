@@ -1,0 +1,164 @@
+/* ---------- Media Player (WMP-style "skin mode" window) ---------- */
+
+/* Skins are sets of custom properties on the window; add one by adding a block. */
+.window.skin[data-skin="blue"] {
+  --mp-bg1: #0A2A72; --mp-bg2: #2F7BE8;
+  --mp-glow: rgba(90, 235, 120, .8); --mp-orb-a: #C9FFC4; --mp-orb-b: #3FD65A; --mp-orb-c: #17863A;
+  --mp-vis-a: #5CCBFF; --mp-vis-b: #2B6BFF; --mp-vis-c: #D4F0FF;
+}
+.window.skin[data-skin="silver"] {
+  --mp-bg1: #2E3856; --mp-bg2: #6F7DA3;
+  --mp-glow: rgba(120, 190, 255, .85); --mp-orb-a: #DCEBFF; --mp-orb-b: #5C9CF0; --mp-orb-c: #2A5FB8;
+  --mp-vis-a: #EAF0FB; --mp-vis-b: #9FB4DC; --mp-vis-c: #FFFFFF;
+}
+.window.skin[data-skin="green"] {
+  --mp-bg1: #0B4A2C; --mp-bg2: #2F9A5C;
+  --mp-glow: rgba(255, 214, 90, .85); --mp-orb-a: #FFF3C2; --mp-orb-b: #FFC93C; --mp-orb-c: #C98A0A;
+  --mp-vis-a: #8DFFA8; --mp-vis-b: #1FC75A; --mp-vis-c: #E8FFEE;
+}
+
+/* Non-rectangular chrome: big asymmetric corner radii instead of the XP frame */
+.window.skin {
+  background: linear-gradient(155deg, var(--mp-bg1) 0%, var(--mp-bg2) 100%);
+  border: 0; border-radius: 34px 110px 34px 64px;
+  /* diffuse, layered drop shadow like the XP compositor, so the window lifts off the wallpaper */
+  box-shadow: 0 22px 48px rgba(0, 0, 20, .5), 0 8px 16px rgba(0, 0, 20, .4), 0 2px 4px rgba(0, 0, 20, .35);
+}
+.window.skin::after {                        /* crisp 1px bevel: light on top/left, dark on bottom/right */
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: 4;
+  border: 1px solid; border-color: #CDE8FF #0B1F6B #0B1F6B #CDE8FF;
+}
+.window.skin:not(.active) { box-shadow: 0 8px 20px rgba(0, 0, 20, .4), 0 2px 4px rgba(0, 0, 20, .3); }
+.window.skin::before {                       /* glass gloss across the top */
+  content: ""; position: absolute; inset: 0 0 55% 0; border-radius: inherit; pointer-events: none;
+  background: linear-gradient(rgba(255, 255, 255, .2), rgba(255, 255, 255, 0));
+}
+.window.skin .titlebar,
+.window.skin:not(.active) .titlebar {
+  position: relative; z-index: 2; min-height: 36px; padding: 9px 84px 0 28px;   /* right padding clears the big top-right curve */
+  background: none; color: #fff; text-shadow: 0 1px 2px rgba(0, 0, 0, .6);
+}
+.window.skin .win-body.mp-body { padding: 0; background: none; border: 0; overflow: hidden; display: grid; grid-template-rows: minmax(0, 1fr); position: relative; z-index: 1; }
+
+.mp { display: grid; grid-template-columns: 172px minmax(0, 1fr); min-height: 0; color: #fff; font-family: Tahoma, "Segoe UI", Arial, sans-serif; }
+
+/* ----- Sidebar: the portfolio's navigation, WMP-style ----- */
+.mp-side { display: flex; flex-direction: column; gap: 4px; padding: 10px 0 0 14px; min-height: 0; }
+.mp-tab {
+  text-align: left; padding: 10px 14px; color: #fff; font: 13px/1.25 Tahoma, "Segoe UI", Arial, sans-serif;
+  background: none; border: 0; border-radius: 18px 0 0 18px; text-shadow: 0 1px 2px rgba(0, 0, 0, .5);
+}
+.mp-tab:hover { background: rgba(255, 255, 255, .16); }
+.mp-tab.active {
+  font-weight: 700;
+  background: linear-gradient(rgba(255, 255, 255, .5), rgba(255, 255, 255, .2) 50%, rgba(255, 255, 255, .3));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .7);
+}
+.mp-tab:focus-visible { outline: 2px dotted #fff; outline-offset: -3px; }
+.mp-side-tools { margin: auto 0 20px 36px; display: flex; gap: 8px; }   /* indented to stay clear of the bottom-left curve */
+.mp-mini {
+  width: 32px; height: 32px; padding: 0; display: grid; place-items: center; color: #fff; cursor: var(--hand);
+  background: rgba(255, 255, 255, .16); border: 1px solid rgba(255, 255, 255, .5); border-radius: 50%;
+}
+.mp-mini:hover { background: rgba(255, 255, 255, .3); }
+.mp-mini:focus-visible { outline: 2px dotted #fff; outline-offset: 2px; }
+
+/* ----- Stage ----- */
+.mp-stage { display: flex; flex-direction: column; min-width: 0; min-height: 0; padding: 4px 0 0 4px; }
+.mp-screen {
+  cursor: crosshair; touch-action: none;
+  position: relative; flex: 1; min-height: 120px; margin-right: 18px; overflow: hidden; border-radius: 18px; background: #050E2C;
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .25), 0 2px 8px rgba(0, 0, 0, .45);
+}
+.mp-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.mp-badge {
+  position: absolute; top: 10px; left: 12px; padding: 3px 11px; border-radius: 12px; opacity: 0; transition: opacity .3s;
+  background: rgba(255, 255, 255, .22); color: #fff; font-size: 12px; text-shadow: 0 1px 1px rgba(0, 0, 0, .5);
+}
+.mp-badge.show { opacity: 1; }
+
+.mp-info { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; padding: 12px 22px 2px 6px; }
+.mp-title { margin: 0; font: 700 18px/1.25 Tahoma, "Segoe UI", Arial, sans-serif; text-shadow: 0 1px 2px rgba(0, 0, 0, .5); }
+.mp-sub { margin: 2px 0 0; font-size: 12px; color: #D6E4FF; }
+.mp-time { font: 400 16px/1 Tahoma, "Segoe UI", Arial, sans-serif; text-shadow: 0 1px 2px rgba(0, 0, 0, .5); }
+
+/* Classic list view: header row + rows; the playing track gets a faint blue selection highlight */
+.mp-tracks { margin: 6px 18px 34px 6px; border: 1px solid rgba(255, 255, 255, .4); border-radius: 3px; background: rgba(4, 18, 70, .42); box-shadow: inset 1px 1px 3px rgba(0, 0, 0, .4); }
+.mp-list-head, .mp-list button { display: grid; grid-template-columns: 34px 1fr auto; gap: 8px; align-items: center; }
+.mp-list-head { padding: 2px 10px; font-size: 11px; color: #D6E4FF; background: linear-gradient(rgba(255, 255, 255, .25), rgba(255, 255, 255, .08)); border-bottom: 1px solid rgba(255, 255, 255, .3); }
+.mp-list { list-style: none; margin: 0; padding: 0; }
+.mp-list button {
+  width: 100%; padding: 3px 10px; color: #fff; font: 12px/1.4 Tahoma, "Segoe UI", Arial, sans-serif; text-align: left; cursor: var(--hand);
+  background: none; border: 0; border-bottom: 1px solid rgba(255, 255, 255, .08);
+}
+.mp-list button span:last-child { color: #C2D6FF; font-size: 11px; }
+.mp-list button:hover { background: rgba(255, 255, 255, .12); }
+.mp-list button:focus-visible { outline: 1px dotted #fff; outline-offset: -2px; }
+.mp-list .current button { background: rgba(120, 175, 255, .4); font-weight: 700; box-shadow: inset 0 0 0 1px rgba(190, 220, 255, .55); }
+
+/* ----- Brushed-silver control deck ----- */
+.mp-deck {
+  position: relative; padding: 8px 28px 16px 20px; border-top: 1px solid #fff;
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, .22) 0 1px, rgba(0, 0, 0, .035) 1px 2px),
+    linear-gradient(#F8FAFD 0%, #DEE4EF 42%, #B6BFD0 100%);
+  box-shadow: 0 -3px 8px rgba(0, 0, 0, .25);
+}
+.mp-seek {
+  position: absolute; top: 0; left: 0; right: 0; height: 6px; overflow: hidden;
+  background: linear-gradient(#7F8AA2, #C4CBD9); box-shadow: inset 0 1px 2px rgba(0, 0, 0, .45);
+}
+.mp-seek i { display: block; width: 0; height: 100%; background: linear-gradient(#9BDBFF, #2B7BFF); }
+
+.mp-ctrls { display: flex; align-items: center; justify-content: center; gap: 12px; color: #2A3556; }
+.mp-round {
+  width: 38px; height: 38px; padding: 0; display: grid; place-items: center; color: #2A3556; cursor: var(--hand);
+  border: 1px solid #6B7A99; border-radius: 50%;
+  background: radial-gradient(circle at 35% 25%, #fff 0, #E4E9F2 40%, #A5B0C6 100%);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .4), inset 0 -2px 3px rgba(0, 0, 0, .15);
+}
+.mp-round svg { width: 18px; height: 18px; }
+.mp-round:hover { filter: brightness(1.06); }
+.mp-round:active { box-shadow: inset 0 2px 4px rgba(0, 0, 0, .35); }
+.mp-round:focus-visible, .mp-play:focus-visible { outline: 2px dotted #1B3A8A; outline-offset: 3px; }
+
+/* The big glass orb breaks out above the deck */
+.mp-play {
+  position: relative; width: 62px; height: 62px; margin-top: -34px; padding: 0; display: grid; place-items: center;
+  color: #fff; cursor: var(--hand); border: 2px solid rgba(255, 255, 255, .95); border-radius: 50%;
+  background: radial-gradient(circle at 38% 24%, var(--mp-orb-a) 0%, var(--mp-orb-b) 52%, var(--mp-orb-c) 100%);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, .35), 0 0 18px 4px var(--mp-glow), 0 5px 9px rgba(0, 0, 0, .45);
+}
+.mp-play::before {                           /* glass highlight */
+  content: ""; position: absolute; left: 12%; right: 12%; top: 5%; height: 44%; border-radius: 50%;
+  background: linear-gradient(rgba(255, 255, 255, .75), rgba(255, 255, 255, .05)); pointer-events: none;
+}
+.mp-play svg { position: relative; width: 28px; height: 28px; filter: drop-shadow(0 1px 1px rgba(0, 0, 0, .5)); }
+.mp-play:hover { filter: brightness(1.08); }
+.mp-play.playing { animation: mp-pulse 1.6s ease-in-out infinite; }
+@keyframes mp-pulse { 50% { box-shadow: 0 0 0 3px rgba(255, 255, 255, .35), 0 0 26px 8px var(--mp-glow), 0 5px 9px rgba(0, 0, 0, .45); } }
+
+/* Volume: metallic groove with a glossy pill thumb */
+.mp-vol-wrap { display: flex; align-items: center; gap: 6px; margin-left: 14px; color: #2A3556; }
+.mp-vol-wrap svg { width: 20px; height: 20px; flex: none; }
+.mp-vol { -webkit-appearance: none; appearance: none; width: 92px; height: 10px; margin: 0; border-radius: 6px; cursor: var(--hand);
+  background: linear-gradient(#7C879C, #C9D0DD); box-shadow: inset 0 1px 2px rgba(0, 0, 0, .5); }
+.mp-vol::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none; width: 24px; height: 15px; border-radius: 8px; border: 1px solid #5C6A85;
+  background: linear-gradient(#fff, #C4CCDB 55%, #8F9BB3); box-shadow: 0 1px 2px rgba(0, 0, 0, .45);
+}
+.mp-vol::-moz-range-thumb {
+  width: 22px; height: 13px; border-radius: 8px; border: 1px solid #5C6A85;
+  background: linear-gradient(#fff, #C4CCDB 55%, #8F9BB3); box-shadow: 0 1px 2px rgba(0, 0, 0, .45);
+}
+.mp-vol::-moz-range-track { height: 10px; border-radius: 6px; background: linear-gradient(#7C879C, #C9D0DD); }
+.mp-vol:focus-visible { outline: 2px dotted #1B3A8A; outline-offset: 3px; }
+
+/* "Open file…" under the playlist */
+.mp-tracks-foot { display: flex; justify-content: flex-end; padding: 4px 8px; border-top: 1px solid rgba(255, 255, 255, .2); }
+.mp-open {
+  padding: 2px 12px; color: #fff; font: 11px/1.4 Tahoma, "Segoe UI", Arial, sans-serif; cursor: var(--hand);
+  background: rgba(255, 255, 255, .14); border: 1px solid rgba(255, 255, 255, .5); border-radius: 3px;
+}
+.mp-open:hover { background: rgba(255, 255, 255, .26); }
+.mp-open:focus-visible { outline: 2px dotted #fff; outline-offset: 1px; }

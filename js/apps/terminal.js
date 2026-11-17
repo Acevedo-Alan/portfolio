@@ -50,12 +50,12 @@ function echo(text) {
 function registerBuiltins() {
   registerCommand('help', () => print(dict()['term-help'].map((line) => `<div>${line}</div>`).join('')));
 
-  // One command per window: `proyectos`, `winamp`, `bugsweeper`, ...
+  // One command per window: `proyectos`, `music`, `bugsweeper`, ... (plus aliases from the registry)
   APPS.filter((app) => app.id !== 'terminal').forEach((app) => {
     registerCommand(app.id, () => {
       print(t('term-goto').replace('%s', t(app.title)));
       windows.open(app.id);
-    });
+    }, { aliases: app.aliases || [] });
   });
 
   // Reads the Device Manager tree, so the stack lives in one place.
@@ -95,7 +95,7 @@ function run(raw) {
   echo(text);
   if (!text) return;
   const [name, ...args] = text.split(/\s+/);
-  const handler = commands.get(name.toLowerCase());
+  const handler = commands.get(name.toLowerCase().replace(/^\//, ''));   // `/music` works like `music`
   if (handler) {
     handler({ args });
   } else {

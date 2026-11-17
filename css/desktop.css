@@ -1,11 +1,34 @@
+/* Wallpapers: each block sets the sky and hill colors. The SVG hills in index.html, the .wallpaper
+   gradient and the Display Properties thumbnails all read these variables. */
+:root, [data-wallpaper="bliss"] {
+  --sky-a: #2F6FD6; --sky-b: #6DAEF5; --sky-c: #CFE8FF;
+  --hill-a1: #8FE04A; --hill-a2: #2F8E1B; --hill-b1: #6CCB36; --hill-b2: #1F6E12; --cloud: 1; --moon: 0;
+}
+[data-wallpaper="autumn"] {
+  --sky-a: #5E8FD0; --sky-b: #A8C8EA; --sky-c: #F3E3C4;
+  --hill-a1: #F2A93B; --hill-a2: #9A4A12; --hill-b1: #D98B2B; --hill-b2: #7A3510; --cloud: 1; --moon: 0;
+}
+[data-wallpaper="azul"] {
+  --sky-a: #2C5E9E; --sky-b: #3F76B8; --sky-c: #5C93D0;
+  --hill-a1: #4B7DB3; --hill-a2: #2F5E94; --hill-b1: #3D6EA8; --hill-b2: #274F80; --cloud: 0; --moon: 0;
+}
+[data-wallpaper="moon"] {
+  --sky-a: #1B1040; --sky-b: #5A2250; --sky-c: #C0502F;
+  --hill-a1: #A63A24; --hill-a2: #4A1810; --hill-b1: #7A2A1C; --hill-b2: #2A0F12; --cloud: 0; --moon: 1;
+}
+
 /* ---------- Wallpaper (Bliss-like) ---------- */
 .wallpaper {
   position: fixed; inset: 0 0 var(--taskbar-h) 0; z-index: 0; overflow: hidden; pointer-events: none;
-  background: linear-gradient(#2F6FD6 0%, #6DAEF5 45%, #CFE8FF 72%);
+  background: linear-gradient(var(--sky-a) 0%, var(--sky-b) 45%, var(--sky-c) 72%);
 }
 .hill { position: absolute; left: 0; bottom: 0; width: 100%; height: 55%; }
+.wallpaper::after {                          /* the moon, only in the "moon" wallpaper */
+  content: ""; position: absolute; right: 14%; top: 12%; width: 120px; height: 120px; border-radius: 50%; opacity: var(--moon);
+  background: radial-gradient(circle at 35% 35%, #FFE7C2, #F2A56B 55%, #B8502C); box-shadow: 0 0 60px 20px rgba(255, 160, 100, .35);
+}
 .cloud {
-  position: absolute; height: 46px; width: 190px; background: #fff; border-radius: 999px; opacity: .92;
+  position: absolute; height: 46px; width: 190px; background: #fff; border-radius: 999px; opacity: calc(.92 * var(--cloud, 1));
   box-shadow: 54px -20px 0 -6px #fff, -46px -10px 0 -10px #fff;
 }
 .cloud-a { left: 26%; top: 12%; }
@@ -26,8 +49,16 @@
   color: #fff; font: 12px/1.2 var(--ui); text-align: center;
   text-shadow: 1px 1px 2px #000, 0 0 3px #000;
 }
-.d-icon svg { width: 40px; height: 40px; filter: drop-shadow(1px 2px 1.5px rgba(0, 0, 0, .55)); }
-.d-icon span { padding: 1px 3px; overflow-wrap: anywhere; }
-.d-icon span::first-letter { text-transform: uppercase; }
-.d-icon:hover span, .d-icon:focus-visible span { background: var(--select); text-shadow: none; }
-.d-icon:focus-visible { outline: 1px dotted #fff; }
+.d-glyph { display: block; width: 40px; height: 40px; }
+.d-glyph img { -webkit-user-drag: none; user-select: none; pointer-events: none; }
+.d-glyph svg, .d-glyph img { width: 40px; height: 40px; filter: drop-shadow(1px 2px 1.5px rgba(0, 0, 0, .55)); }
+.d-label { padding: 1px 3px; overflow-wrap: anywhere; border: 1px solid transparent; }
+.d-label::first-letter { text-transform: uppercase; }
+.d-icon:hover .d-label { background: rgba(49, 106, 197, .45); text-shadow: none; }
+
+/* Classic XP selection: the icon is blended with the selection blue, the label turns dark blue with
+   white text, and a dotted outline marks the label. (Keyboard focus shows the same dotted outline.) */
+.d-icon.selected .d-glyph svg, .d-icon.selected .d-glyph img { filter: url(#f-select) drop-shadow(1px 2px 1.5px rgba(0, 0, 0, .55)); }
+.d-icon.selected .d-label { background: #316AC5; text-shadow: none; border: 1px dotted #fff; }
+.d-icon:focus-visible { outline: none; }
+.d-icon:focus-visible .d-label { border: 1px dotted #fff; background: rgba(49, 106, 197, .6); text-shadow: none; }

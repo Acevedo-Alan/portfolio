@@ -10,7 +10,7 @@
  *   mascot.css      Patito (rubber duck) and its speech bubble
  *   content.css     hero, experience, projects, education, contact
  *   apps/*.css      one file per app window (Device Manager, Explorer,
- *                   System Properties, terminal, Bug Sweeper, Winamp, bin)
+ *                   System Properties, terminal, Bug Sweeper, Media Player, bin)
  *   responsive.css  phone layout overrides (loaded last)
  *
  * Naming convention: lowercase kebab-case throughout.
