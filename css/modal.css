@@ -1,6 +1,6 @@
 /* ---------- Wizard dialogs (CD burning, dial-up) ---------- */
 .xp-backdrop { position: fixed; inset: 0; z-index: 9800; display: grid; place-items: center; padding: 12px; background: rgba(0, 0, 30, .38); }
-.window.xp-modal { position: relative; left: auto; top: auto; z-index: auto; width: min(520px, 100%); height: auto; animation: win-pop .16s ease-out; }
+.window.xp-modal { position: relative; left: auto; top: auto; z-index: auto; width: min(520px, 100%); height: auto; }
 .wiz { display: flex; min-height: 220px; background: #fff; color: #000; }
 .wiz-side { flex: none; width: 128px; display: grid; place-items: center; background: linear-gradient(#2D62C8, #7DA4EF); }
 .wiz-side svg, .wiz-side img { width: 76px; height: 76px; filter: drop-shadow(2px 3px 3px rgba(0, 0, 0, .4)); }

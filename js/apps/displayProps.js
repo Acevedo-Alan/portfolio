@@ -11,10 +11,12 @@ import { translate } from '../i18n/i18n.js';
 import { initTabs } from '../ui/tabs.js';
 import { WALLPAPERS, THEMES, TILES, tileUrl, get as getAppearance, set as setAppearance } from '../shell/appearance.js';
 import * as windows from '../shell/windowManager.js';
+import * as motion from '../shell/motion.js';
 
 export function mount() {
   const root = $('#win-display .dp-body');
-  let pending = getAppearance();
+  const current = () => ({ ...getAppearance(), effects: motion.isOn() });
+  let pending = current();
 
   const radios = (name, values, labelPrefix, kind) => values.map((value) => `
     <label class="dp-option">
@@ -40,6 +42,10 @@ export function mount() {
         <fieldset class="group"><legend data-i18n="dp-theme"></legend>
           <div class="dp-list" role="radiogroup" data-i18n-label="dp-theme">${radios('dp-theme', THEMES, 'dp-theme-', 'theme')}</div>
         </fieldset>
+        <fieldset class="group"><legend data-i18n="dp-effects"></legend>
+          <label class="dp-check"><input type="checkbox" name="dp-effects"> <span data-i18n="dp-effects-label"></span></label>
+          <p class="dp-note" data-i18n="dp-effects-note"></p>
+        </fieldset>
       </div>
       <div role="tabpanel" id="dp-panel-account" class="tab-panel" aria-labelledby="dp-tab-account" hidden>
         <fieldset class="group"><legend data-i18n="dp-account-h"></legend>
@@ -56,12 +62,13 @@ export function mount() {
   initTabs(root);
 
   const applyBtn = $('[data-dp="apply"]', root);
-  const dirty = () => { const now = getAppearance(); return pending.wallpaper !== now.wallpaper || pending.theme !== now.theme || pending.tile !== now.tile; };
+  const dirty = () => { const now = current(); return Object.keys(now).some((key) => pending[key] !== now[key]); };
 
   function render() {
     $$('input[name="dp-wallpaper"]', root).forEach((r) => { r.checked = r.value === pending.wallpaper; });
     $$('input[name="dp-theme"]', root).forEach((r) => { r.checked = r.value === pending.theme; });
     $$('input[name="dp-tile"]', root).forEach((r) => { r.checked = r.value === pending.tile; });
+    $('input[name="dp-effects"]', root).checked = pending.effects;
     $('#dp-preview', root).dataset.wallpaper = pending.wallpaper;
     applyBtn.disabled = !dirty();
   }
@@ -70,19 +77,21 @@ export function mount() {
     if (e.target.name === 'dp-wallpaper') pending.wallpaper = e.target.value;
     if (e.target.name === 'dp-theme') pending.theme = e.target.value;
     if (e.target.name === 'dp-tile') pending.tile = e.target.value;
+    if (e.target.name === 'dp-effects') pending.effects = e.target.checked;
     render();
   });
 
-  const commit = () => { setAppearance(pending); render(); };
+  const commit = () => { setAppearance(pending); motion.setEnabled(pending.effects); render(); };
   $('[data-dp="apply"]', root).addEventListener('click', commit);
   $('[data-dp="ok"]', root).addEventListener('click', () => { commit(); windows.close('display'); });
   $('[data-dp="cancel"]', root).addEventListener('click', () => windows.close('display'));
 
   // Every time the dialog opens, start from what's currently applied.
-  const reset = () => { pending = getAppearance(); render(); };
+  const reset = () => { pending = current(); render(); };
   bus.on('window:opened', ({ id }) => { if (id === 'display') reset(); });
   bus.on('window:closed', ({ id }) => { if (id === 'display') reset(); });
   bus.on('appearance:changed', reset);
+  bus.on('effects:changed', reset);
   bus.on('lang:changed', render);
   bus.on('display:tab', (tab) => { const button = $(`#dp-tab-${tab}`, root); if (button) button.click(); });   // e.g. the Start menu portrait opens the Account tab
   render();

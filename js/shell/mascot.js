@@ -10,6 +10,8 @@
  *
  * Reacts to the event bus: a short hover over a desktop icon, or opening a
  * window, shows that app's tip; after IDLE_MS of quiet it offers a random tip.
+ * Contextual offers ("want the CV?") come from shell/mascotTips.js through offer(),
+ * which adds an action button to the bubble.
  */
 
 import { $ } from '../core/dom.js';
@@ -26,13 +28,24 @@ const BUBBLE_MS = 9000;
 const GREETING_MS = 14000;
 const GREETING_DELAY_MS = 2200;
 const SAME_TIP_COOLDOWN_MS = 15000;
+const OFFER_MS = 16000;
 
 let on = false;
 let bubbleTimer = null;
 let idleTimer = null;
 let lastTip = { key: '', at: 0 };
 
+export const isOn = () => on;
+
+/** Says `text` with a button that runs `action.run` ({ label, run }). No-op while Patito is hidden. Returns whether it spoke. */
+export function offer(text, action) {
+  if (!on) return false;
+  say(text, OFFER_MS, action);
+  return true;
+}
+
 export function init() {
+  bus.on('power:down', hideBubble);
   bus.on('icon:hover', ({ id }) => tip('tip-' + id));
   bus.on('window:opened', ({ id, quiet }) => { if (!quiet) tip('tip-' + id); });
 
@@ -82,10 +95,14 @@ function syncMenuLabel() {
 
 // ---------- Speaking ----------
 
-function say(html, ms = BUBBLE_MS) {
+function say(html, ms = BUBBLE_MS, action = null) {
   if (!on || !html) return;
   const mascot = $('#mascot');
   $('#mascot-text').innerHTML = html;
+  const button = $('#mascot-act');
+  button.hidden = !action;
+  button.textContent = action ? action.label : '';
+  button.onclick = action ? () => { hideBubble(); action.run(); } : null;
   $('#mascot-bubble').hidden = false;
   mascot.classList.remove('hop');
   void mascot.offsetWidth;                    // restart the hop animation

@@ -50,6 +50,10 @@
 <link rel="stylesheet" href="css/mascot.css">
 <link rel="stylesheet" href="css/modal.css">
 <link rel="stylesheet" href="css/welcome.css">
+<link rel="stylesheet" href="css/effects.css">
+<link rel="stylesheet" href="css/power.css">
+<link rel="stylesheet" href="css/bsod.css">
+<link rel="stylesheet" href="css/switcher.css">
 <link rel="stylesheet" href="css/contextmenu.css">
 <link rel="stylesheet" href="css/content.css">
 <link rel="stylesheet" href="css/apps/sysprops.css">
@@ -60,6 +64,8 @@
 <link rel="stylesheet" href="css/apps/player.css">
 <link rel="stylesheet" href="css/apps/recycle.css">
 <link rel="stylesheet" href="css/apps/display.css">
+<link rel="stylesheet" href="css/apps/notepad.css">
+<link rel="stylesheet" href="css/apps/solitaire.css">
 <link rel="stylesheet" href="css/theme-zune.css">
 <link rel="stylesheet" href="css/responsive.css">
 <link rel="stylesheet" href="css/fallback.css">
@@ -396,6 +402,13 @@
   <section id="win-bugsweeper"><div class="win-body ms-body"></div></section>
   <section id="win-music"><div class="win-body mp-body"></div></section>
   <section id="win-papelera"><div class="win-body bin-body"></div></section>
+  <section id="win-readme">
+    <div class="win-body np-body">
+      <div class="np-menu" aria-hidden="true"><span data-i18n="np-file">Archivo</span><span data-i18n="np-edit">Edición</span><span data-i18n="np-format">Formato</span><span data-i18n="np-view">Ver</span><span data-i18n="np-help">Ayuda</span></div>
+      <textarea id="np-text" class="np-text" spellcheck="false" data-i18n-label="app-readme" aria-label="readme.txt"></textarea>
+    </div>
+  </section>
+  <section id="win-solitaire"><div class="win-body sol-body"></div></section>
   <section id="win-display"><div class="win-body sp-body dp-body"></div></section>
 
 </main>
@@ -405,6 +418,7 @@
   <div class="mascot-bubble" id="mascot-bubble" role="status" aria-live="polite" hidden>
     <button type="button" class="mascot-x" id="mascot-x" data-i18n-label="mascot-hide" aria-label="Ocultar a Patito">×</button>
     <p id="mascot-text"></p>
+    <button type="button" class="btn-xp mascot-act" id="mascot-act" hidden></button>
   </div>
   <button type="button" class="mascot-char" id="mascot-char" data-i18n-label="mascot-tip" aria-label="Patito: ver un consejo">
     <svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">
@@ -449,6 +463,8 @@
   </div>
   <div class="sm-foot">
     <button type="button" id="close-all" role="menuitem" data-i18n="close-all"></button>
+    <button type="button" id="logoff" role="menuitem"><img src="imgs/xp-icons/logout.png" alt="" aria-hidden="true" draggable="false"><span data-i18n="sm-logoff"></span></button>
+    <button type="button" id="turnoff" role="menuitem"><img src="imgs/xp-icons/power.png" alt="" aria-hidden="true" draggable="false"><span data-i18n="sm-turnoff"></span></button>
   </div>
 </div>
 

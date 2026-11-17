@@ -8,7 +8,7 @@
  * `inert` while the dialog is open.
  */
 
-import { $, $$, icon, escapeHTML } from '../core/dom.js';
+import { $, $$, icon, escapeHTML, setInert } from '../core/dom.js';
 import { t } from '../i18n/i18n.js';
 import { play } from '../audio/sounds.js';
 
@@ -44,7 +44,7 @@ export function openWizard({ titleKey, iconId, onClose = () => {} }) {
     </div>`;
   document.body.appendChild(backdrop);
   const dialog = $('.xp-modal', backdrop);
-  INERT_SELECTORS.forEach((sel) => { const el = $(sel); if (el) el.inert = true; });
+  setInert(INERT_SELECTORS, true);
   play('exclamation');
 
   let closed = false;
@@ -53,7 +53,7 @@ export function openWizard({ titleKey, iconId, onClose = () => {} }) {
     closed = true;
     document.removeEventListener('keydown', onKeydown, true);
     backdrop.remove();
-    INERT_SELECTORS.forEach((sel) => { const el = $(sel); if (el) el.inert = false; });
+    setInert(INERT_SELECTORS, false);
     active = null;
     onClose();
     if (previouslyFocused && previouslyFocused.focus) previouslyFocused.focus();

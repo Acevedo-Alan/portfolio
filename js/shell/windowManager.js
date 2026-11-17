@@ -12,6 +12,7 @@ import { isMobile, desktopSize, TASKBAR_H } from '../core/viewport.js';
 import * as bus from '../core/bus.js';
 import { translate } from '../i18n/i18n.js';
 import { play } from '../audio/sounds.js';
+import * as motion from './motion.js';
 
 const CONTROLS = { normal: ['min', 'max', 'close'], fixed: ['min', 'close'], skin: ['min', 'close'], dialog: ['close'] };
 const MIN_W = 300;
@@ -25,7 +26,7 @@ const GLYPHS = {
   close: '<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M1.5 1.5l7 7M8.5 1.5l-7 7" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>',
 };
 
-/** id -> { app, el, status: 'closed' | 'open' | 'min', maximized } */
+/** id -> { app, el, status: 'closed' | 'open' | 'min', maximized, leaving } (leaving = the effect still hiding it) */
 const wins = new Map();
 let zTop = 100;
 let activeId = null;
@@ -47,15 +48,17 @@ export function open(id, { quiet = false } = {}) {
   if (!w) return;
   const wasClosed = w.status === 'closed';
   const restored = w.status === 'min';
+  cancelLeaving(w);
 
   if (wasClosed) {
+    w.el.classList.remove('maxi');
     place(w);
     w.el.hidden = false;
-    w.el.classList.add('opening');
-    w.el.addEventListener('animationend', () => w.el.classList.remove('opening'), { once: true });
+    motion.windowOpen(w.el);
     play('menu');
   } else if (restored) {
     w.el.hidden = false;
+    motion.windowRestore(w.el, taskRect(id));
     play('restore');
   }
   w.status = 'open';
@@ -77,7 +80,7 @@ export function minimize(id) {
   const w = wins.get(id);
   if (!w || w.status !== 'open') return;
   w.status = 'min';
-  w.el.hidden = true;
+  leave(w, motion.windowMinimize(w.el, taskRect(id)));
   play('min');
   bus.emit('window:minimized', { id });
   activateTopmost();
@@ -86,10 +89,11 @@ export function minimize(id) {
 export function close(id) {
   const w = wins.get(id);
   if (!w || w.status === 'closed') return;
+  const wasVisible = !w.el.hidden;
   w.status = 'closed';
-  w.el.hidden = true;
   w.maximized = false;
-  w.el.classList.remove('maxi', 'active');
+  w.el.classList.remove('active');
+  if (wasVisible) leave(w, motion.windowClose(w.el)); else { w.el.hidden = true; w.el.classList.remove('maxi'); }
   bus.emit('window:closed', { id });
   activateTopmost();
 }
@@ -101,8 +105,10 @@ export function closeAll() {
 export function toggleMaximize(id) {
   const w = wins.get(id);
   if (!w || w.status !== 'open' || !CONTROLS[chromeOf(w.app)].includes('max')) return;
+  const before = w.el.getBoundingClientRect();
   w.maximized = !w.maximized;
   w.el.classList.toggle('maxi', w.maximized);
+  motion.windowResize(w.el, before);
   const btn = $('.wb-max', w.el);
   btn.setAttribute('data-i18n-label', w.maximized ? 'win-restore' : 'win-max');
   translate(w.el);
@@ -113,6 +119,34 @@ export function toggleMaximize(id) {
 export function setPath(id, path) {
   const span = $(`#addr-${id} span`);
   if (span) span.textContent = path;
+}
+
+// ---------- Leaving effects ----------
+
+/** The task button a window minimizes to / restores from (null when it has none yet). */
+const taskRect = (id) => {
+  const button = document.querySelector(`.task[data-win="${id}"]`);
+  return button ? button.getBoundingClientRect() : null;
+};
+
+/** Keeps `w` on screen, inert, until its minimize/close effect ends, then hides it. */
+function leave(w, effect) {
+  w.leaving = effect;
+  w.el.classList.add('leaving');
+  effect.finished.then(() => {
+    if (w.leaving !== effect) return;            // reopened meanwhile
+    w.leaving = null;
+    w.el.classList.remove('leaving');
+    w.el.hidden = true;
+    if (w.status === 'closed') w.el.classList.remove('maxi');
+  });
+}
+
+function cancelLeaving(w) {
+  if (!w.leaving) return;
+  w.leaving.cancel();
+  w.leaving = null;
+  w.el.classList.remove('leaving');
 }
 
 // ---------- Building ----------
@@ -153,7 +187,7 @@ function build(app) {
     bar.after(addr);
   }
 
-  const w = { app, el, status: 'closed', maximized: false };
+  const w = { app, el, status: 'closed', maximized: false, leaving: null };
   wins.set(app.id, w);
 
   el.addEventListener('pointerdown', () => focus(app.id), true);

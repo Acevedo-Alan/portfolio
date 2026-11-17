@@ -9,8 +9,7 @@
   overflow: hidden; outline: none;
 }
 .window[hidden] { display: none; }
-.window.opening { animation: win-pop .16s ease-out; }
-@keyframes win-pop { from { transform: scale(.92); opacity: 0; } }
+.window.leaving { pointer-events: none; }               /* still on screen while its minimize/close effect plays */
 .window:not(.active) { border-color: var(--frame-off); box-shadow: 1px 2px 6px rgba(0, 0, 0, .3); }
 .window.maxi {
   left: 0 !important; top: 0 !important; width: 100vw !important; height: calc(100dvh - var(--taskbar-h)) !important;

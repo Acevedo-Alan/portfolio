@@ -1,0 +1,8 @@
+/* ---------- Blue Screen of Death easter egg (js/shell/bsod.js) ---------- */
+.bsod {
+  position: fixed; inset: 0; z-index: 40000; overflow: auto; padding: 6vh 7vw; outline: none; cursor: none;
+  background: #0000AA; color: #fff; font: 15px/1.35 "Lucida Console", "Courier New", monospace;
+}
+.bsod-text { max-width: 78ch; }
+.bsod p { margin: 0 0 1.1em; white-space: pre-wrap; overflow-wrap: anywhere; }
+@media (max-width: 700px) { .bsod { font-size: 12px; padding: 5vh 5vw; } }

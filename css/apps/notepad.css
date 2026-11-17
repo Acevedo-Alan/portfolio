@@ -1,0 +1,9 @@
+/* ---------- Notepad (readme.txt) ---------- */
+.win-body.np-body { padding: 0; display: flex; flex-direction: column; overflow: hidden; background: #fff; }
+.np-menu { flex: none; display: flex; gap: 2px; padding: 2px 4px; background: var(--beige); border-bottom: 1px solid #ACA899; font-size: 12px; color: #000; user-select: none; }
+.np-menu span { padding: 2px 7px; }
+.np-text {
+  flex: 1; min-height: 0; width: 100%; padding: 6px 8px; resize: none; border: 0; outline: none;
+  background: #fff; color: #000; font: 13px/1.45 "Lucida Console", "Courier New", monospace; cursor: text;
+}
+html[data-theme="zune"] .np-text { background: #1B1B1E; color: #E9E9EC; }

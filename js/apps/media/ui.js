@@ -306,7 +306,8 @@ export function mount() {
   player.setMaster(effective());
   bus.on('volume:changed', ({ effective: scale }) => player.setMaster(scale));   // the tray's volume drives the Web Audio master gain
   bus.on('lang:changed', sync);
-  bus.on('window:closed', ({ id }) => { if (id === 'music') actions.stop(); });   // closing the player stops the music
+  bus.on('window:closed', ({ id }) => { if (id === 'music') actions.stop(); });
+  bus.on('power:down', () => actions.stop());                                      // Log Off / Turn Off silence the player
 
   readPalette();
   renderList();

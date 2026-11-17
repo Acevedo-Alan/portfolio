@@ -23,13 +23,14 @@
   position: relative; width: min(270px, calc(100vw - 32px)); padding: 10px 28px 12px 12px;
   background: var(--balloon); border: 1px solid #000; border-radius: 8px;
   box-shadow: 2px 3px 6px rgba(0, 0, 0, .4); font-size: 12.5px; line-height: 1.5;
-  animation: win-pop .2s ease-out;
 }
 .mascot-bubble[hidden] { display: none; }
 .mascot-bubble::after {
   content: ""; position: absolute; right: 26px; bottom: -11px;
   border: 6px solid transparent; border-top: 10px solid #000; border-bottom: 0;
 }
+.mascot-act { display: block; margin-top: 8px; min-width: 0; }
+.mascot-act[hidden] { display: none; }
 .mascot-x {
   position: absolute; top: 3px; right: 4px; background: none; border: 0; cursor: var(--hand);
   font: 700 16px/1 var(--ui); color: #333; padding: 0 4px;

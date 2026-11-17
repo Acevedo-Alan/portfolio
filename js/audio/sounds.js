@@ -17,6 +17,9 @@ const FILES = {
   ding: 'Windows XP Ding.mp3',
   error: 'Windows XP Error.mp3',
   exclamation: 'Windows XP Exclamation.mp3',
+  shutdown: 'shutdown.wav',
+  logoff: 'logoff.wav',
+  critical: 'critical-stop.wav',
 };
 
 const cache = {};

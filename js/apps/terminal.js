@@ -11,6 +11,7 @@ import * as bus from '../core/bus.js';
 import { t, dict, setLang } from '../i18n/i18n.js';
 import { play } from '../audio/sounds.js';
 import * as windows from '../shell/windowManager.js';
+import * as bsod from '../shell/bsod.js';
 import { APPS } from './registry.js';
 import { getStackGroups } from './deviceManager.js';
 
@@ -84,7 +85,8 @@ function registerBuiltins() {
     print(t('term-email-opening'));
   });
 
-  // Easter egg: deliberately left out of `help`.
+  // Easter eggs: deliberately left out of `help`.
+  registerCommand('bsod', () => bsod.show());
   registerCommand('sudo', () => { play('exclamation'); print(t('term-sudo')); });
 }
 

@@ -28,6 +28,7 @@ function addTask(id) {
   const btn = document.createElement('button');
   btn.type = 'button';
   btn.className = 'task';
+  btn.dataset.win = id;
   btn.innerHTML = `${icon(app.icon)}<span data-i18n="${app.title}"></span>`;
   btn.addEventListener('click', () => {
     if (windows.getStatus(id) === 'min') windows.open(id);

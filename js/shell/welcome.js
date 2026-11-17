@@ -9,7 +9,7 @@
  * to the URL to bypass it.
  */
 
-import { $ } from '../core/dom.js';
+import { $, setInert } from '../core/dom.js';
 import { play } from '../audio/sounds.js';
 
 const INERT_SELECTORS = ['#desktop', '.taskbar', '#start-menu'];
@@ -19,14 +19,20 @@ const FADE_MS = 400;
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-/** Resolves to true if the welcome screen ran, false if it was skipped. */
-export async function run() {
+/**
+ * Resolves to true if the welcome screen ran, false if it was skipped.
+ * `force` shows it again (after Log Off or a restart) even though this session already logged on.
+ */
+export async function run({ force = false } = {}) {
   const root = document.documentElement;
+  if (force) root.classList.add('welcome-pending');
   if (!root.classList.contains('welcome-pending')) return false;
 
   const screen = $('#welcome');
   const user = $('#ws-user');
-  INERT_SELECTORS.forEach((sel) => { const el = $(sel); if (el) el.inert = true; });
+  user.disabled = false;
+  $('#ws-loading').hidden = true;
+  setInert(INERT_SELECTORS, true);
   user.focus();
 
   await new Promise((resolve) => user.addEventListener('click', resolve, { once: true }));
@@ -40,7 +46,7 @@ export async function run() {
   await sleep(reducedMotion() ? 0 : FADE_MS);
   root.classList.remove('welcome-pending');
   screen.classList.remove('leaving');
-  INERT_SELECTORS.forEach((sel) => { const el = $(sel); if (el) el.inert = false; });
+  setInert(INERT_SELECTORS, false);
   try { sessionStorage.setItem('portfolio-welcomed', '1'); } catch (e) { /* storage unavailable */ }
   return true;
 }

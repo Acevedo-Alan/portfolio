@@ -1,0 +1,24 @@
+/* ---------- Visual effects ----------
+   js/shell/motion.js sets html[data-effects="on"|"off"] from the visitor's choice (Display Properties)
+   or their OS "reduce motion" setting. Every CSS animation lives here so switching it off is one place.
+   Window open/close/minimize/maximize effects are JS (Web Animations) in the same module. */
+
+@keyframes menu-in { from { opacity: 0; transform: translateY(6px); } }
+@keyframes pop-in { from { opacity: 0; transform: scale(.92); } }
+@keyframes desktop-in { from { opacity: 0; } }
+@keyframes taskbar-in { from { opacity: 0; transform: translateY(100%); } }
+
+/* menus and popups fade in (XP's "fade effect for menus") */
+html[data-effects="on"] .start-menu:not([hidden]),
+html[data-effects="on"] .ctx-menu,
+html[data-effects="on"] .ctx-menu li.open > .ctx-sub,
+html[data-effects="on"] .vol-pop:not([hidden]) { animation: menu-in .14s ease-out; }
+
+/* balloons, Patito's bubble and wizard dialogs pop */
+html[data-effects="on"] .balloon:not([hidden]),
+html[data-effects="on"] .mascot-bubble:not([hidden]),
+html[data-effects="on"] .window.xp-modal { animation: pop-in .18s ease-out; }
+
+/* "Loading your personal settings": the desktop fades in after logging on */
+html[data-effects="on"].desktop-enter #desktop { animation: desktop-in .8s ease-out; }
+html[data-effects="on"].desktop-enter .taskbar { animation: taskbar-in .5s .15s ease-out backwards; }

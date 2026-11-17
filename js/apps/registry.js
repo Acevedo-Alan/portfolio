@@ -31,6 +31,8 @@ export const APPS = [
   { id: 'bugsweeper',  icon: 'minesweeper',     title: 'box-bugsweeper',  w: 330, h: 520, chrome: 'fixed', noAddr: true, group: 'extras' },
   { id: 'music',       icon: 'windows-media-player-10',   title: 'box-music',       w: 780, h: 580, chrome: 'skin', noAddr: true, aliases: ['player', 'winamp'], group: 'extras' },
   { id: 'papelera',    icon: 'recycle-bin-full',     title: 'box-papelera',    w: 660, h: 380, group: 'tools' },
+  { id: 'readme',      icon: 'notepad',    title: 'box-readme',      w: 520, h: 440, noAddr: true, aliases: ['notepad', 'txt'], group: 'tools' },
+  { id: 'solitaire',   icon: 'solitaire',  title: 'box-solitaire',   w: 640, h: 560, chrome: 'fixed', noAddr: true, aliases: ['cards'], group: 'extras' },
   { id: 'display',     icon: 'display-properties', title: 'box-display',     w: 420, h: 540, chrome: 'dialog', noAddr: true, desktop: false, aliases: ['properties'], group: 'tools' },
 ];
 
