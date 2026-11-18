@@ -165,6 +165,20 @@ function navButtons() {
     + '</div>';
 }
 
+const VIEWS_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="4" width="18" height="16" fill="#fff" stroke="#3F5A8C"/><path d="M6 8h4M6 12h4M6 16h4" stroke="#3F5A8C" stroke-width="2"/><path d="M13 8h5M13 12h5M13 16h5" stroke="#9BB0D6" stroke-width="2"/></svg>';
+
+/** The standard toolbar of an Explorer-style window: Back, Forward, Up and a Views menu. js/apps/experience.js wires it. */
+function toolbar() {
+  const button = (name, sym) => `<button type="button" class="xtb-btn" data-tb="${name}">${icon(sym)}<span data-i18n="nav-${name}"></span></button>`;
+  return `<div class="xtb" role="toolbar" data-i18n-label="tb-label">`
+    + button('back', 'back') + button('forward', 'forward') + button('up', 'up')
+    + '<span class="xtb-sep" aria-hidden="true"></span>'
+    + `<span class="xtb-drop"><button type="button" class="xtb-btn" data-tb="views" aria-haspopup="menu" aria-expanded="false">${VIEWS_ICON}<span data-i18n="tb-views"></span><i class="xtb-caret" aria-hidden="true"></i></button>`
+    + '<ul class="xtb-menu" role="menu" hidden>'
+    + ['details', 'list'].map((view) => `<li role="none"><button type="button" role="menuitemradio" aria-checked="false" data-view="${view}"><span class="xtb-dot" aria-hidden="true"></span><span data-i18n="tb-view-${view}"></span></button></li>`).join('')
+    + '</ul></span></div>';
+}
+
 function build(app) {
   const el = document.getElementById('win-' + app.id);
   const chrome = chromeOf(app);
@@ -185,6 +199,11 @@ function build(app) {
     addr.innerHTML = (app.nav ? navButtons() : '')
       + `<span data-i18n="addr-label"></span><div class="addr-box" id="addr-${app.id}">${icon('folder-closed')}<span>C:\\Portfolio\\${app.id}</span></div>`;
     bar.after(addr);
+  }
+  if (app.toolbar) {
+    const tb = document.createElement('div');
+    tb.innerHTML = toolbar();
+    bar.after(tb.firstChild);                                     // title bar, toolbar, then the address bar
   }
 
   const w = { app, el, status: 'closed', maximized: false, leaving: null };

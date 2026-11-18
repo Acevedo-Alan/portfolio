@@ -23,7 +23,11 @@ import { VISUALIZERS } from './visualizers.js';
 const SKINS = ['blue', 'silver', 'green'];
 const SKIN_KEY = 'portfolio-mp-skin';
 const VIS_KEY = 'portfolio-mp-vis';
+const SHUFFLE_KEY = 'portfolio-mp-shuffle';
+const REPEAT_KEY = 'portfolio-mp-repeat';
 const BADGE_MS = 2200;
+const ERROR_BADGE_MS = 4500;
+const VOLUME_STEP = 5;
 
 // The sidebar doubles as portfolio navigation. `open` = window to open;
 // `action: 'burn'` launches the CD-burning wizard that delivers the résumé.
@@ -43,6 +47,8 @@ const ICONS = {
   next: svg('<path d="M15.5 5H18v14h-2.5zM4 5l11 7-11 7z"/>'),
   speaker: svg('<path d="M3 9h4l5-4v14l-5-4H3z"/><path d="M15 9a4 4 0 0 1 0 6M17.5 6.5a8 8 0 0 1 0 11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>'),
   vis: svg('<path d="M4 20V10h3v10zM10.5 20V4h3v16zM17 20v-7h3v7z"/>', 18),
+  shuffle: svg('<path d="M3 7h3c5 0 6 10 11 10h3M3 17h3c1.5 0 2.600-.7 3.500-1.800M13.500 8.800C14.400 7.700 15.500 7 17 7h3M17.500 4.500L20 7l-2.500 2.500M17.500 14.500L20 17l-2.500 2.500" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>', 18),
+  repeat: svg('<path d="M17 3l3 3-3 3M4 11V9a3 3 0 0 1 3-3h13M7 21l-3-3 3-3M20 13v2a3 3 0 0 1-3 3H4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>', 18),
   skin: svg('<circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="9" cy="10" r="1.6"/><circle cx="14.5" cy="9" r="1.6"/><circle cx="15" cy="14.5" r="1.6"/>', 18),
 };
 
@@ -64,6 +70,9 @@ export function mount() {
   let visIndex = storedVis >= 0 ? storedVis : 0;
   let renderer = VISUALIZERS[visIndex].create();
   let index = 0;
+  let shuffle = storage.get(SHUFFLE_KEY) === '1';
+  let repeat = storage.get(REPEAT_KEY) === '1';       // repeat = replay the current track when it ends
+  let playTicket = 0;                                  // the newest play request wins when clicks overlap
 
   root.innerHTML = `
     <div class="mp">
@@ -97,10 +106,12 @@ export function mount() {
         <div class="mp-deck">
           <div class="mp-seek" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-i18n-label="mp-progress"><i></i></div>
           <div class="mp-ctrls">
-            <button type="button" class="mp-round" data-act="stop" data-i18n-label="mp-stop">${ICONS.stop}</button>
+            <button type="button" class="mp-toggle" data-act="shuffle" aria-pressed="${shuffle}" data-i18n-label="mp-shuffle">${ICONS.shuffle}</button>
+            <button type="button" class="mp-round" data-act="stop"data-i18n-label="mp-stop">${ICONS.stop}</button>
             <button type="button" class="mp-round" data-act="prev" data-i18n-label="mp-prev">${ICONS.prev}</button>
             <button type="button" class="mp-play" data-act="toggle" data-i18n-label="mp-play">${ICONS.play}</button>
             <button type="button" class="mp-round" data-act="next" data-i18n-label="mp-next">${ICONS.next}</button>
+            <button type="button" class="mp-toggle" data-act="repeat" aria-pressed="${repeat}" data-i18n-label="mp-repeat">${ICONS.repeat}</button>
             <label class="mp-vol-wrap">${ICONS.speaker}<input type="range" class="mp-vol" min="0" max="100" value="70" data-i18n-label="mp-volume"></label>
           </div>
         </div>
@@ -222,6 +233,7 @@ export function mount() {
     const seek = $('.mp-seek', root);
     $('i', seek).style.width = pct + '%';
     seek.setAttribute('aria-valuenow', String(pct));
+    seek.classList.toggle('seekable', player.seekable);
   }
 
   function sync() {
@@ -235,30 +247,63 @@ export function mount() {
     updateReadouts();
   }
 
-  function flashBadge() {
+  function showBadge(text, ms = BADGE_MS) {
     const badge = $('#mp-badge', root);
-    badge.textContent = `${t(VISUALIZERS[visIndex].labelKey)} · ${t('mp-drag-hint')}`;
+    badge.textContent = text;
     badge.classList.add('show');
     clearTimeout(badgeTimer);
-    badgeTimer = setTimeout(() => badge.classList.remove('show'), BADGE_MS);
+    badgeTimer = setTimeout(() => badge.classList.remove('show'), ms);
+  }
+
+  const flashBadge = () => showBadge(`${t(VISUALIZERS[visIndex].labelKey)} · ${t('mp-drag-hint')}`);
+
+  /** Something went wrong with playback: stop cleanly and say why on the screen. */
+  function fail(key) {
+    player.stop();
+    stopLoop();
+    renderer.reset();
+    paintIdle();
+    sync();
+    showBadge(t(key), ERROR_BADGE_MS);
   }
 
   // ---------- Transport ----------
 
   async function playIndex(i) {
     index = (i + tracks.length) % tracks.length;
-    await player.play(tracks[index]);
+    const ticket = ++playTicket;
+    try {
+      await player.play(tracks[index]);
+    } catch (e) {
+      if (ticket !== playTicket || e.name === 'AbortError') return;     // superseded by a newer click, or interrupted by pause/stop
+      fail(e.name === 'NotAllowedError' ? 'mp-err-blocked' : 'mp-err-play');
+      return;
+    }
+    if (ticket !== playTicket) return;
     renderer.reset();
     sync();
     startLoop();
   }
 
+  /** The track after the current one: a random other track when shuffling. */
+  function nextIndex() {
+    if (!shuffle || tracks.length < 2) return index + 1;
+    return (index + 1 + Math.floor(Math.random() * (tracks.length - 1))) % tracks.length;
+  }
+
+  function setToggle(act, value, key) {
+    storage.set(key, value ? '1' : '0');
+    $(`[data-act="${act}"]`, root).setAttribute('aria-pressed', String(value));
+  }
+
   const actions = {
     toggle: () => (player.playing ? actions.pause() : playIndex(index)),
     pause: async () => { await player.pause(); stopLoop(); sync(); },
-    stop: () => { player.stop(); stopLoop(); renderer.reset(); paintIdle(); sync(); },
+    shuffle: () => { shuffle = !shuffle; setToggle('shuffle', shuffle, SHUFFLE_KEY); },
+    repeat: () => { repeat = !repeat; setToggle('repeat', repeat, REPEAT_KEY); },
+    stop: () => { playTicket++; player.stop(); stopLoop(); renderer.reset(); paintIdle(); sync(); },
     prev: () => playIndex(index - 1),
-    next: () => playIndex(index + 1),
+    next: () => playIndex(nextIndex()),
     'open-file': () => $('#mp-file', root).click(),
     skin: () => {
       skin = cycle(SKINS, skin);
@@ -284,7 +329,49 @@ export function mount() {
     if (tab) { windows.open(tab.dataset.open); return; }
     if (e.target.closest('[data-action="burn"]')) openBurnWizard();
   });
-  $('.mp-vol', root).addEventListener('input', (e) => player.setVolume(Number(e.target.value) / 100));
+  const volume = $('.mp-vol', root);
+  volume.addEventListener('input', (e) => player.setVolume(Number(e.target.value) / 100));
+
+  // Click or drag the progress bar to jump within a file track (the synth loops, so it has nothing to seek).
+  const seekBar = $('.mp-seek', root);
+  const seekTo = (e) => {
+    const rect = seekBar.getBoundingClientRect();
+    player.seek((e.clientX - rect.left) / rect.width);
+    updateReadouts();
+  };
+  let seeking = false;
+  seekBar.addEventListener('pointerdown', (e) => {
+    if (!player.seekable) return;
+    seeking = true;
+    seekBar.setPointerCapture(e.pointerId);
+    seekTo(e);
+  });
+  seekBar.addEventListener('pointermove', (e) => { if (seeking) seekTo(e); });
+  const endSeek = () => { seeking = false; };
+  seekBar.addEventListener('pointerup', endSeek);
+  seekBar.addEventListener('pointercancel', endSeek);
+
+  // Keyboard, only while focus is inside the player: Space play/pause, arrows for tracks and volume.
+  win.addEventListener('keydown', (e) => {
+    if (e.altKey || e.ctrlKey || e.metaKey) return;
+    if (e.target.closest('button') && (e.key === ' ' || e.key === 'Enter')) return;     // a focused button keeps its own activation
+    if (e.target === volume && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) return; // the slider's own arrows
+    const bump = (delta) => {
+      volume.value = String(Math.min(100, Math.max(0, Number(volume.value) + delta)));
+      volume.dispatchEvent(new Event('input'));
+    };
+    const keys = {
+      ' ': actions.toggle,
+      ArrowRight: actions.next,
+      ArrowLeft: actions.prev,
+      ArrowUp: () => bump(VOLUME_STEP),
+      ArrowDown: () => bump(-VOLUME_STEP),
+    };
+    const handler = keys[e.key];
+    if (!handler) return;
+    e.preventDefault();
+    handler();
+  });
 
   // A file the visitor picks plays straight from their computer (an object URL): nothing is uploaded or hosted.
   $('#mp-file', root).addEventListener('change', (e) => {
@@ -301,7 +388,8 @@ export function mount() {
     renderList();
     sync();
   });
-  player.onEnded = () => playIndex(index + 1);      // a finished file moves on to the next track
+  player.onEnded = () => playIndex(repeat ? index : nextIndex());   // a finished file repeats or moves on
+  player.onError = () => fail('mp-err-play');
 
   player.setMaster(effective());
   bus.on('volume:changed', ({ effective: scale }) => player.setMaster(scale));   // the tray's volume drives the Web Audio master gain

@@ -80,7 +80,8 @@ function leaveDesktop() {
   bus.emit('power:down');
   bus.emit('startmenu:close');
   windows.closeAll();
-  try { sessionStorage.removeItem(SESSION_KEY); } catch (e) { /* storage unavailable */ }
+  try { ['portfolio-welcomed', 'portfolio-token', 'portfolio-profile'].forEach((key) => sessionStorage.removeItem(key)); } catch (e) { /* storage unavailable */ }
+  delete document.documentElement.dataset.profile;
 }
 
 /** Back to the welcome screen, then the desktop. */
@@ -88,6 +89,7 @@ async function logOn() {
   hideScreen();
   await welcome.run({ force: true });
   windows.open('whoami', { quiet: true });
+  if (welcome.isRecruiter()) windows.open('experiencia', { quiet: true });
   desktopFadeIn();
 }
 

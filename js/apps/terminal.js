@@ -64,8 +64,8 @@ function registerBuiltins() {
     .map((g) => `<div><span class="cmd-hl">${escapeHTML(g.name)}</span>: ${escapeHTML(g.items.join(' · '))}</div>`)
     .join('')));
 
-  registerCommand('contact', () => print($$('.contact-links a')
-    .map((a) => `<div>${a.outerHTML}</div>`)
+  registerCommand('contact', () => print($$('#win-contacto .ct-row')
+    .map((r) => `<div><a href="${r.dataset.href}" target="_blank" rel="noopener">${$('input', r).value}</a></div>`)
     .join('')));
 
   registerCommand('clear', () => { log.innerHTML = ''; }, { aliases: ['cls'] });

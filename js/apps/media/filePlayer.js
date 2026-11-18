@@ -14,6 +14,8 @@ export class FilePlayer {
 
   /** Called when a track plays to its end. */
   onEnded = () => {};
+  /** Called when the audio element reports a load or decode failure. */
+  onError = () => {};
 
   constructor(output) {
     this.#out = output;
@@ -27,10 +29,23 @@ export class FilePlayer {
     return duration && Number.isFinite(duration) ? this.#audio.currentTime / duration : 0;
   }
 
+  /** True once the file's length is known, i.e. jumping to a position makes sense. */
+  get seekable() {
+    return !!this.#audio && Number.isFinite(this.#audio.duration) && this.#audio.duration > 0;
+  }
+
+  /** Jumps to `fraction` (0..1) of the track. */
+  seek(fraction) {
+    if (!this.seekable) return;
+    this.#audio.currentTime = Math.min(Math.max(fraction, 0), 1) * this.#audio.duration;
+  }
+
   async play(track) {
     if (track !== this.#track) this.#load(track);
+    const audio = this.#audio;
     await this.#out.ctx.resume();
-    await this.#audio.play();
+    if (audio !== this.#audio) return;           // stopped or replaced while resuming: nothing to play any more
+    await audio.play();
   }
 
   async pause() {
@@ -52,6 +67,7 @@ export class FilePlayer {
     this.#source = this.#out.ctx.createMediaElementSource(audio);
     this.#source.connect(this.#out.master);
     audio.addEventListener('ended', () => this.onEnded());
+    audio.addEventListener('error', () => { if (audio === this.#audio) this.onError(); });
     this.#audio = audio;
     this.#track = track;
   }

@@ -1,0 +1,101 @@
+/* ---------- Experience: Win32 "Add or Remove Programs" list inside an Explorer-style window ----------
+   Win32 look: Tahoma 11px with font smoothing off where the browser allows it, sunken 2px list boxes,
+   plain text instead of chips, yellow tooltips instead of badges, classic blue underlined links. */
+
+/* ----- Standard toolbar (built by windowManager) ----- */
+.xtb {
+  flex: none; display: flex; align-items: center; gap: 1px; padding: 2px 4px; color: #000;
+  background: linear-gradient(#FBFBF9, #ECE9D8); border-bottom: 1px solid #ACA899;
+  font: 11px/1.2 Tahoma, "Segoe UI", sans-serif; -webkit-font-smoothing: none; font-smooth: never; text-rendering: optimizeSpeed;
+}
+.xtb-btn {
+  display: flex; align-items: center; gap: 4px; padding: 2px 6px; color: inherit; font: inherit; cursor: var(--hand);
+  background: none; border: 1px solid transparent; border-radius: 3px;
+}
+.xtb-btn img, .xtb-btn svg { width: 22px; height: 22px; flex: none; display: block; }
+.xtb-btn:hover:not(:disabled), .xtb-btn[aria-expanded="true"] { border-color: #ACA899; background: linear-gradient(#fff, #ECEBE5); }
+.xtb-btn[aria-expanded="true"] { background: linear-gradient(#CECABB, #E3E1D6); }
+.xtb-btn:disabled { opacity: .45; cursor: default; }
+.xtb-btn:focus-visible { outline: 1px dotted #000; outline-offset: -3px; }
+.xtb-sep { width: 2px; height: 22px; margin: 0 4px; border-left: 1px solid #ACA899; border-right: 1px solid #fff; }
+.xtb-caret { margin-left: 2px; border: 3px solid transparent; border-top: 4px solid #000; border-bottom: 0; }
+.xtb-drop { position: relative; }
+.xtb-menu {
+  position: absolute; left: 0; top: 100%; z-index: 30; min-width: 140px; margin: 1px 0 0; padding: 2px; list-style: none;
+  background: #fff; border: 1px solid #ACA899; box-shadow: 3px 3px 4px rgba(0, 0, 0, .4);
+}
+.xtb-menu[hidden] { display: none; }
+.xtb-menu button {
+  position: relative; width: 100%; display: block; padding: 4px 14px 4px 24px; color: #000; font: inherit; text-align: left;
+  background: none; border: 0; cursor: var(--hand);
+}
+.xtb-menu button:hover, .xtb-menu button:focus-visible { background: #316AC5; color: #fff; outline: none; }
+.xtb-dot { position: absolute; left: 9px; top: 50%; width: 5px; height: 5px; margin-top: -2px; border-radius: 50%; background: currentColor; display: none; }
+.xtb-menu [aria-checked="true"] .xtb-dot { display: block; }
+
+/* ----- The list ----- */
+.win-body.exp-body {
+  padding: 0; display: flex; flex-direction: column; overflow: hidden; background: var(--beige); border-top: 0; color: #000;
+  font: 11px/1.45 Tahoma, "Segoe UI", sans-serif; -webkit-font-smoothing: none; font-smooth: never; text-rendering: optimizeSpeed;
+}
+.exp-caption { flex: none; margin: 0; padding: 8px 10px 4px; font-weight: 700; }
+
+.exp-list {
+  flex: 1; min-height: 0; margin: 2px 8px 6px; padding: 0; overflow: auto; list-style: none; background: #fff;
+  border: 2px solid; border-color: #808080 #fff #fff #808080; box-shadow: inset 1px 1px 0 #404040, inset -1px -1px 0 #D4D0C8;
+}
+.exp-row:nth-child(even) { background: #EDEDED; }
+.exp-row.open, .exp-row.open:nth-child(even) { background: #DCE6F9; box-shadow: inset 0 0 0 1px #7F9DB9; }
+
+.exp-h { margin: 0; font: inherit; }
+.exp-toggle {
+  width: 100%; display: flex; align-items: center; gap: 8px; padding: 5px 8px; color: inherit; font: inherit; text-align: left;
+  background: none; border: 0; cursor: var(--hand);
+}
+.exp-toggle:hover { background: rgba(0, 0, 0, .05); }
+.exp-toggle:focus-visible { outline: 1px dotted #000; outline-offset: -3px; }
+.exp-ico { width: 16px; height: 16px; flex: none; }
+.exp-name { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.exp-title { font: 700 12px/1.35 Tahoma, "Segoe UI", sans-serif; color: #000; }
+.exp-sub { color: #555; }
+.exp-list[data-view="list"] .exp-sub { display: none; }
+
+/* the + / - box of a tree view */
+.exp-pm { position: relative; width: 9px; height: 9px; flex: none; background: #fff; border: 1px solid #808080; }
+.exp-pm::before, .exp-pm::after { content: ""; position: absolute; background: #000; }
+.exp-pm::before { left: 1px; right: 1px; top: 3px; height: 1px; }
+.exp-pm::after { top: 1px; bottom: 1px; left: 3px; width: 1px; }
+.exp-row.open .exp-pm::after { display: none; }
+
+/* status as a Windows tooltip: pale yellow, 1px black border, black Tahoma */
+.exp-tag { flex: none; padding: 1px 5px; color: #000; background: #FFFFE1; border: 1px solid #000; font: 11px/1.3 Tahoma, "Segoe UI", sans-serif; text-transform: capitalize; }
+
+.exp-panel { padding: 2px 12px 12px 34px; }
+.exp-panel[hidden] { display: none; }
+.exp-fields { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 10px; align-items: center; margin: 4px 0 10px; }
+.exp-fields dt { margin: 0; }
+.exp-fields dd { margin: 0; min-width: 0; }
+/* read-only field with a sunken 2px border (dark top/left, white bottom/right) */
+.exp-field {
+  display: flex; align-items: center; gap: 6px; padding: 2px 5px; background: #fff;
+  border: 2px solid; border-color: #808080 #fff #fff #808080; box-shadow: inset 1px 1px 0 #404040, inset -1px -1px 0 #D4D0C8;
+}
+.exp-field img { width: 16px; height: 16px; flex: none; }
+.exp-field span { min-width: 0; overflow-wrap: anywhere; }
+
+.exp-bullets { margin: 0; padding: 0; list-style: none; display: grid; gap: 5px; }
+.exp-bullets li { position: relative; padding-left: 14px; line-height: 1.5; font-weight: 400; }
+.exp-bullets li::before { content: ""; position: absolute; left: 3px; top: 7px; width: 4px; height: 4px; background: #000; }
+/* emphasis inside the descriptions stays light so it doesn't compete with the titles */
+.exp-bullets strong { font-weight: 400; color: #00247A; }
+.exp-body a { color: #0000FF; text-decoration: underline; }
+.exp-body a:visited { color: #800080; }
+
+.exp-status { flex: none; padding: 2px 6px 3px; border-top: 1px solid #ACA899; }
+.exp-status span { display: block; padding: 1px 5px; border: 1px solid; border-color: #808080 #fff #fff #808080; }
+
+@media (max-width: 560px) {
+  .exp-panel { padding-left: 14px; }
+  .exp-fields { grid-template-columns: 1fr; gap: 2px; }
+  .exp-toggle { flex-wrap: wrap; }
+}

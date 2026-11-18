@@ -2,7 +2,10 @@
  * apps/solitaire/engine.js — Klondike rules, no DOM. State is plain data so it can be
  * tested in Node (tests/solitaire.test.mjs).
  *
- *   state = { stock, waste, foundations: [4 piles], tableau: [7 piles], moves }
+ *   state = { stock, waste, foundations: [4 piles], tableau: [7 piles], moves, score, draw }
+ *   draw  = how many stock cards a draw turns over (1 or 3)
+ *   score = Windows-style scoring: waste→tableau +5, →foundation +10, foundation→tableau −15,
+ *           a revealed tableau card +5, recycling the waste with draw 1 −100 (never below 0)
  *   card  = { suit: 'S'|'H'|'D'|'C', rank: 1..13, up: boolean }
  *
  * A "place" names where cards come from or go to:
@@ -29,17 +32,18 @@ export function shuffle(cards, random = Math.random) {
   return deck;
 }
 
-export function deal(random = Math.random) {
+export function deal(random = Math.random, draw = 1) {
   const deck = shuffle(newDeck(), random);
   const tableau = Array.from({ length: 7 }, (_, col) => {
     const pile = deck.splice(0, col + 1);
     pile[pile.length - 1].up = true;
     return pile;
   });
-  return { stock: deck, waste: [], foundations: [[], [], [], []], tableau, moves: 0 };
+  return { stock: deck, waste: [], foundations: [[], [], [], []], tableau, moves: 0, score: 0, draw };
 }
 
 const top = (pile) => pile[pile.length - 1];
+const addScore = (state, points) => { state.score = Math.max(0, state.score + points); };
 
 // ---------- Rules ----------
 
@@ -73,7 +77,7 @@ function take(state, from, count) {
   if (from.zone === 'foundation') return state.foundations[from.index].splice(-1, 1);
   const pile = state.tableau[from.index];
   const taken = pile.splice(pile.length - count, count);
-  if (pile.length) top(pile).up = true;                   // reveal the card that was underneath
+  if (pile.length && !top(pile).up) { top(pile).up = true; addScore(state, 5); }   // reveal the card that was underneath
   return taken;
 }
 
@@ -82,12 +86,16 @@ function take(state, from, count) {
 /** Turns a stock card onto the waste; with an empty stock, recycles the waste (face down). */
 export function drawFromStock(state) {
   if (state.stock.length) {
-    const card = state.stock.pop();
-    card.up = true;
-    state.waste.push(card);
+    const count = Math.min(state.draw || 1, state.stock.length);
+    for (let i = 0; i < count; i++) {
+      const card = state.stock.pop();
+      card.up = true;
+      state.waste.push(card);
+    }
   } else if (state.waste.length) {
     state.stock = state.waste.reverse().map((card) => ({ ...card, up: false }));
     state.waste = [];
+    if ((state.draw || 1) === 1) addScore(state, -100);
   } else {
     return false;
   }
@@ -99,17 +107,22 @@ export function move(state, from, to) {
   const cards = picked(state, from);
   if (!cards.length) return false;
   const count = cards.length;
+  let points = 0;
   if (to.zone === 'foundation') {
     if (count !== 1 || !canGoToFoundation(cards[0], state.foundations[to.index])) return false;
     if (from.zone === 'foundation' && from.index === to.index) return false;
+    if (from.zone !== 'foundation') points = 10;
     state.foundations[to.index].push(...take(state, from, 1));
   } else if (to.zone === 'tableau') {
     if (from.zone === 'tableau' && from.index === to.index) return false;
     if (!canGoToTableau(cards[0], state.tableau[to.index])) return false;
+    if (from.zone === 'waste') points = 5;
+    if (from.zone === 'foundation') points = -15;
     state.tableau[to.index].push(...take(state, from, count));
   } else {
     return false;
   }
+  addScore(state, points);
   state.moves++;
   return true;
 }

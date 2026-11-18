@@ -19,32 +19,24 @@
 .hero-bio { line-height: 1.8; max-width: 62ch; }
 
 /* ---------- Experience & projects (task-pane style groups) ---------- */
-.exp-item, .proj-card { border: 1px solid #7F9DB9; margin-bottom: 16px; padding-bottom: 12px; background: #fff; }
-.exp-item:last-child, .proj-card:last-child { margin-bottom: 0; }
-.exp-item > :not(.exp-head), .proj-card > :not(.proj-head) { margin-left: 12px; margin-right: 12px; }
+.proj-card { border: 1px solid #7F9DB9; margin-bottom: 16px; padding-bottom: 12px; background: #fff; }
+.proj-card:last-child { margin-bottom: 0; }
+.proj-card > :not(.proj-head) { margin-left: 12px; margin-right: 12px; }
 
-.exp-head, .proj-head {
+.proj-head {
   display: flex; justify-content: space-between; align-items: center; gap: 8px 12px; flex-wrap: wrap;
   padding: 6px 10px; margin-bottom: 10px;
   background: linear-gradient(90deg, #fff 0%, #C6D3F7 100%);
 }
-.exp-title-row { display: flex; align-items: baseline; gap: 8px; }
-.exp-num { color: #555; }
-.exp-title, .proj-name { font: 700 13.5px/1.3 var(--ui); color: var(--link); }
-.exp-tag {
-  font-size: 10.5px; padding: 1px 8px; border-radius: 9px; font-weight: 700;
-  background: var(--select); color: #fff; text-transform: uppercase; letter-spacing: .02em;
-}
-.exp-meta { color: #555; font-size: 12px; margin-bottom: 10px; }
-.exp-meta .org { color: #000; font-weight: 700; }
+.proj-name { font: 700 13.5px/1.3 var(--ui); color: var(--link); }
 
-.exp-bullets, .proj-bullets { list-style: none; display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
-.exp-bullets li, .proj-bullets li { padding-left: 16px; position: relative; line-height: 1.75; }
-.exp-bullets li::before, .proj-bullets li::before {
+.proj-bullets { list-style: none; display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+.proj-bullets li { padding-left: 16px; position: relative; line-height: 1.75; }
+.proj-bullets li::before {
   content: ""; position: absolute; left: 2px; top: 7px; width: 6px; height: 6px;
   background: var(--select); border-radius: 50%;
 }
-.exp-bullets strong, .proj-bullets strong { font-weight: 700; }
+.proj-bullets strong { font-weight: 700; }
 
 .chip-row { display: flex; flex-wrap: wrap; gap: 5px; }
 .chip {
@@ -85,20 +77,4 @@
 @media (prefers-reduced-motion: reduce) { .hexa-wave span { animation: none; } }
 
 /* ---------- Education ---------- */
-.edu-item { display: flex; flex-direction: column; gap: 3px; }
-.edu-degree { font: 700 15px/1.3 var(--title); }
-.edu-org { color: var(--link); font-weight: 700; }
-.edu-meta { color: #555; font-size: 12px; }
-.edu-status {
-  align-self: flex-start; margin-top: 8px; font-size: 11px; font-weight: 700; padding: 2px 9px;
-  background: #E6F4DA; color: #2B6A12; border: 1px solid #6FA64B; border-radius: 2px;
-}
 
-/* ---------- Contact ---------- */
-.contact-links { display: flex; flex-direction: column; border: 1px solid #7F9DB9; }
-.contact-links a {
-  display: flex; align-items: center; gap: 12px; padding: 8px 12px; color: #000; text-decoration: none;
-}
-.contact-links a + a { border-top: 1px solid #E1E6F4; }
-.contact-links a:hover, .contact-links a:focus-visible { background: var(--select); color: #fff; outline: none; }
-.contact-links .k { width: 70px; flex: none; font-weight: 700; }

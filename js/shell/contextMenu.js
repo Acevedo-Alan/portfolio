@@ -41,6 +41,9 @@ function desktopItems() {
         { label: t('ctx-name'), onClick: () => desktopIcons.arrangeBy('name') },
         { label: t('ctx-size'), onClick: () => desktopIcons.arrangeBy('size') },
         { label: t('ctx-type'), onClick: () => desktopIcons.arrangeBy('type') },
+        { separator: true },
+        { label: t('ctx-auto'), checked: desktopIcons.isAutoArrange(), onClick: desktopIcons.toggleAutoArrange },
+        { label: t('ctx-grid'), checked: desktopIcons.isAlignToGrid(), onClick: desktopIcons.toggleAlignToGrid },
       ],
     },
     { label: t('ctx-refresh'), onClick: desktopIcons.refresh },
@@ -71,8 +74,9 @@ function build(items) {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'ctx-item' + (item.bold ? ' bold' : '');
-    btn.setAttribute('role', 'menuitem');
-    btn.innerHTML = `<span>${escapeHTML(item.label)}</span>${item.submenu ? '<span class="ctx-arrow" aria-hidden="true">▸</span>' : ''}`;
+    btn.setAttribute('role', item.checked === undefined ? 'menuitem' : 'menuitemcheckbox');
+    if (item.checked !== undefined) btn.setAttribute('aria-checked', String(item.checked));
+    btn.innerHTML = `${item.checked ? '<span class="ctx-check" aria-hidden="true">✓</span>' : ''}<span>${escapeHTML(item.label)}</span>${item.submenu ? '<span class="ctx-arrow" aria-hidden="true">▸</span>' : ''}`;
     li.appendChild(btn);
 
     if (item.submenu) {

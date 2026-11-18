@@ -14,6 +14,7 @@
 
 export const FILE_TRACKS = [
   { name: 'Paranoid Android', artist: 'Radiohead', bpm: 164, src: 'music/paranoid-android.mp3' },
+  { name: 'Entre Sombras', artist: 'PATS', src: 'music/PATS - Entre Sombras.mp3' },
 ];
 
 async function exists(url) {

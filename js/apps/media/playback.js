@@ -20,9 +20,17 @@ export class Playback {
   get elapsed() { return this.#active.elapsed; }
   get progress() { return this.#active.progress; }
   get analyser() { return this.#out.analyser; }
+  /** Only file tracks can be seeked; the synth loops forever. */
+  get seekable() { return this.#active === this.#files && this.#files.seekable; }
 
   /** Called when a file track reaches its end (synth tracks loop forever). */
   set onEnded(handler) { this.#files.onEnded = handler; }
+
+  /** Called when a file fails to load or decode. */
+  set onError(handler) { this.#files.onError = handler; }
+
+  /** Jumps to `fraction` (0..1) of the current file track; ignored for synth tracks. */
+  seek(fraction) { if (this.seekable) this.#files.seek(fraction); }
 
   setVolume(volume) { this.#out.setVolume(volume); }
   setMaster(scale) { this.#out.setMaster(scale); }

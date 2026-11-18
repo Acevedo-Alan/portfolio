@@ -1,0 +1,15 @@
+/* ---------- Doom (js-dos in an iframe) ---------- */
+.win-body.doom-body { padding: 0; display: flex; flex-direction: column; overflow: hidden; background: #000; }
+.doom-bar { flex: none; display: flex; justify-content: flex-end; padding: 4px 8px; background: var(--beige); border-bottom: 1px solid #ACA899; }
+.doom-stage { position: relative; flex: 1; min-height: 0; }
+.doom-screen { position: absolute; inset: 0; background: #000; }
+.doom-screen[hidden] { display: none; }
+.doom-frame { display: block; width: 100%; height: 100%; border: 0; background: #000; }
+.doom-start {
+  position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 16px; text-align: center;
+  color: #E8D9C0; background: radial-gradient(ellipse at 50% 40%, #5A1A10, #120403 70%);
+}
+.doom-start[hidden] { display: none; }
+.doom-title { margin: 0; font: 900 64px/1 Impact, "Arial Black", sans-serif; letter-spacing: 6px; color: #C7281A; text-shadow: 0 3px 0 #2A0804, 0 0 24px rgba(255, 90, 40, .45); }
+.doom-note { margin: 0; min-height: 1.3em; font-size: 12px; color: #FFD9A8; }
+.doom-keys { margin: 0; max-width: 360px; font-size: 11px; line-height: 1.5; color: #B9A58A; }

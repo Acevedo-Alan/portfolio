@@ -23,17 +23,20 @@
 export const APPS = [
   { id: 'whoami',      icon: 'user-accounts',    title: 'box-whoami',      w: 480, h: 580, chrome: 'dialog', noAddr: true, group: 'portfolio' },
   { id: 'stack',       icon: 'computer-management',    title: 'box-stack',       w: 560, h: 460, group: 'portfolio' },
-  { id: 'experiencia', icon: 'briefcase',    title: 'box-experiencia', w: 660, h: 560, group: 'portfolio' },
+  { id: 'experiencia', icon: 'briefcase',    title: 'box-experiencia', w: 660, h: 560, toolbar: true, group: 'portfolio' },
   { id: 'proyectos',   icon: 'my-documents',  title: 'box-proyectos',   w: 780, h: 560, nav: true, group: 'portfolio' },
-  { id: 'educacion',   icon: 'certificate',     title: 'box-educacion',   w: 460, h: 280, group: 'portfolio' },
-  { id: 'contacto',    icon: 'email',    title: 'box-contacto',    w: 460, h: 290, group: 'portfolio' },
+  { id: 'educacion',   icon: 'certificate',     title: 'box-educacion',   w: 640, h: 230, group: 'portfolio' },
+  { id: 'contacto',    icon: 'email',    title: 'box-contacto',    w: 540, h: 300, group: 'portfolio' },
+  { id: 'mail',        icon: 'email',    title: 'box-mail',        w: 560, h: 460, noAddr: true, desktop: false, aliases: ['outlook', 'correo'], group: 'tools' },
   { id: 'terminal',    icon: 'command-prompt',    title: 'app-terminal',    w: 600, h: 380, noAddr: true, group: 'tools' },
   { id: 'bugsweeper',  icon: 'minesweeper',     title: 'box-bugsweeper',  w: 330, h: 520, chrome: 'fixed', noAddr: true, group: 'extras' },
   { id: 'music',       icon: 'windows-media-player-10',   title: 'box-music',       w: 780, h: 580, chrome: 'skin', noAddr: true, aliases: ['player', 'winamp'], group: 'extras' },
   { id: 'papelera',    icon: 'recycle-bin-full',     title: 'box-papelera',    w: 660, h: 380, group: 'tools' },
   { id: 'readme',      icon: 'notepad',    title: 'box-readme',      w: 520, h: 440, noAddr: true, aliases: ['notepad', 'txt'], group: 'tools' },
   { id: 'solitaire',   icon: 'solitaire',  title: 'box-solitaire',   w: 640, h: 560, chrome: 'fixed', noAddr: true, aliases: ['cards'], group: 'extras' },
-  { id: 'display',     icon: 'display-properties', title: 'box-display',     w: 420, h: 540, chrome: 'dialog', noAddr: true, desktop: false, aliases: ['properties'], group: 'tools' },
+  { id: 'doom',        icon: 'doom', title: 'box-doom',        w: 660, h: 500, noAddr: true, aliases: ['dos'], group: 'extras' },
+  { id: 'chess',       icon: 'chess', title: 'box-chess',       w: 720, h: 640, noAddr: true, aliases: ['ajedrez', 'titans'], group: 'extras' },
+  { id: 'display',    icon: 'display-properties', title: 'box-display',     w: 420, h: 540, chrome: 'dialog', noAddr: true, desktop: false, aliases: ['properties'], group: 'tools' },
 ];
 
 /** Order used by "Arrange Icons By → Type". */

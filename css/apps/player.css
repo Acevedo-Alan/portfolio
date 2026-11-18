@@ -105,9 +105,11 @@
   box-shadow: 0 -3px 8px rgba(0, 0, 0, .25);
 }
 .mp-seek {
-  position: absolute; top: 0; left: 0; right: 0; height: 6px; overflow: hidden;
+  position: absolute; top: 0; left: 0; right: 0; height: 6px; touch-action: none;
   background: linear-gradient(#7F8AA2, #C4CBD9); box-shadow: inset 0 1px 2px rgba(0, 0, 0, .45);
 }
+.mp-seek::before { content: ""; position: absolute; inset: -7px 0; }       /* a taller hit area than the thin bar */
+.mp-seek.seekable { cursor: var(--hand); }
 .mp-seek i { display: block; width: 0; height: 100%; background: linear-gradient(#9BDBFF, #2B7BFF); }
 
 .mp-ctrls { display: flex; align-items: center; justify-content: center; gap: 12px; color: #2A3556; }
@@ -121,6 +123,15 @@
 .mp-round:hover { filter: brightness(1.06); }
 .mp-round:active { box-shadow: inset 0 2px 4px rgba(0, 0, 0, .35); }
 .mp-round:focus-visible, .mp-play:focus-visible { outline: 2px dotted #1B3A8A; outline-offset: 3px; }
+
+/* Shuffle / repeat: small flat toggles beside the transport buttons */
+.mp-toggle {
+  width: 30px; height: 30px; padding: 0; display: grid; place-items: center; color: #5A6785; cursor: var(--hand);
+  background: none; border: 1px solid transparent; border-radius: 50%;
+}
+.mp-toggle:hover { background: rgba(255, 255, 255, .45); }
+.mp-toggle[aria-pressed="true"] { color: #fff; background: linear-gradient(#5C9CF0, #2A5FB8); border-color: #1B3A8A; box-shadow: inset 0 1px 2px rgba(0, 0, 0, .35); }
+.mp-toggle:focus-visible { outline: 2px dotted #1B3A8A; outline-offset: 3px; }
 
 /* The big glass orb breaks out above the deck */
 .mp-play {

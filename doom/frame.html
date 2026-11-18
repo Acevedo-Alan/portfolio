@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Doom</title>
+<!--
+  The game runs in its own page (an iframe of the Doom window) on purpose: js-dos listens for keys on
+  the whole window and swallows them, so inside the portfolio's page it would break Esc, typing in
+  other windows and the desktop shortcuts. In an iframe it only sees keys while the game has focus.
+  Talks to the portfolio with postMessage: it sends { type: 'doom-ready' | 'doom-error' } and
+  accepts { type: 'doom-volume', value: 0..1 }.
+-->
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #000; }
+  #game { position: fixed; inset: 0; }
+</style>
+<!-- Pinned, so an upstream release can never change what the site runs. -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/js-dos@8.3.20/dist/js-dos.css">
+</head>
+<body>
+<div id="game"></div>
+<script>
+  const CDN = 'https://cdn.jsdelivr.net/npm/js-dos@8.3.20/dist/';
+  const tell = (type) => parent.postMessage({ type }, location.origin);
+  let game = null;
+
+  function boot() {
+    try {
+      if (!window.Dos) throw new Error('js-dos did not initialise');
+      game = window.Dos(document.getElementById('game'), {
+        url: 'doom.jsdos',
+        pathPrefix: CDN + 'emulators/',
+        autoStart: true,
+        kiosk: true,            // just the game: no js-dos sidebar or cloud features
+        noCloud: true,
+        theme: 'dark',
+      });
+      window.focus();
+      tell('doom-ready');
+    } catch (e) {
+      console.error('Doom could not start', e);
+      tell('doom-error');
+    }
+  }
+
+  window.addEventListener('message', (e) => {
+    if (e.origin !== location.origin || !e.data || e.data.type !== 'doom-volume') return;
+    if (game && typeof game.setVolume === 'function') game.setVolume(Number(e.data.value));
+  });
+
+  // In full screen Esc would leave full screen instead of reaching Doom's menu: ask the browser to hand it over.
+  document.addEventListener('fullscreenchange', () => {
+    try {
+      if (!navigator.keyboard) return;
+      if (document.fullscreenElement) navigator.keyboard.lock(['Escape']); else navigator.keyboard.unlock();
+    } catch (e) { /* not supported: holding Esc still leaves full screen */ }
+  });
+
+  // Clicking the game keeps the keyboard on it.
+  document.addEventListener('pointerdown', () => window.focus());
+</script>
+<script src="https://cdn.jsdelivr.net/npm/js-dos@8.3.20/dist/js-dos.js" onload="boot()" onerror="tell('doom-error')"></script>
+</body>
+</html>

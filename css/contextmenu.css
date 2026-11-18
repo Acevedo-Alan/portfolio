@@ -12,6 +12,8 @@
 .ctx-item.bold { font-weight: 700; }
 .ctx-item:hover, .ctx-item:focus-visible, .ctx-menu li.open > .ctx-item { background: #316AC5; color: #fff; outline: none; }
 .ctx-arrow { font-size: 9px; }
+.ctx-item { position: relative; }
+.ctx-check { position: absolute; left: 6px; top: 50%; width: 14px; transform: translateY(-50%); font-size: 12px; font-weight: 700; line-height: 1; text-align: center; }
 .ctx-sep hr { margin: 3px 2px; border: 0; border-top: 1px solid #D4D0C8; }
 .ctx-menu.ctx-sub { display: none; position: absolute; left: 100%; top: -4px; z-index: 1; }
 .ctx-menu li.open > .ctx-sub { display: block; }

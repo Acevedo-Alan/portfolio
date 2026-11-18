@@ -38,6 +38,8 @@ import { mount as mountExplorer } from './apps/explorer.js';
 import { mount as mountTerminal } from './apps/terminal.js';
 import { mount as mountNotepad } from './apps/notepad.js';
 import { mount as mountRecycleBin } from './apps/recycleBin.js';
+import { mount as mountExperience } from './apps/experience.js';
+import { mount as mountContact } from './apps/contact.js';
 import { mount as mountDisplayProps } from './apps/displayProps.js';
 
 // App id -> its mount function. Static-content windows (experiencia,
@@ -49,6 +51,8 @@ const MOUNTS = {
   terminal: mountTerminal,
   readme: mountNotepad,
   papelera: mountRecycleBin,
+  experiencia: mountExperience,
+  contacto: mountContact,
   display: mountDisplayProps,
 };
 
@@ -58,6 +62,8 @@ const LAZY = {
   bugsweeper: () => import('./apps/minesweeper/ui.js'),
   solitaire: () => import('./apps/solitaire/ui.js'),
   music: () => import('./apps/media/ui.js'),
+  doom: () => import('./apps/doom/ui.js'),
+  chess: () => import('./apps/chess/ui.js'),
 };
 const loading = new Set();
 bus.on('window:opened', async ({ id }) => {
@@ -101,6 +107,7 @@ mascotTips.init();
 // Deep links (e.g. /#contacto) open that window; otherwise start on "about me".
 const hash = location.hash.slice(1);
 windows.open(windows.has(hash) ? hash : 'whoami', { quiet: true });
+if (welcome.isRecruiter() && !windows.has(hash)) windows.open('experiencia', { quiet: true });      // the recruiter's summary: about me + experience
 
 // Everything is wired: tell the boot guard in index.html not to show the fallback.
 document.documentElement.classList.add('app-ready');

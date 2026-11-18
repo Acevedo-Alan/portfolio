@@ -33,21 +33,16 @@ html[data-theme="zune"] .info-card,
 html[data-theme="zune"] .exp-item,
 html[data-theme="zune"] .proj-card,
 html[data-theme="zune"] .dm,
-html[data-theme="zune"] .contact-links,
 html[data-theme="zune"] .stack-grid { background: #232326; border-color: #3A3A40; }
 html[data-theme="zune"] .exp-head,
 html[data-theme="zune"] .proj-head { background: linear-gradient(90deg, #2E2E33, #4A2A18); }
 html[data-theme="zune"] .proj-card.featured { border-color: #F26B21; box-shadow: 0 0 0 1px #8A3E14; }
 html[data-theme="zune"] .exp-meta,
 html[data-theme="zune"] .exp-num,
-html[data-theme="zune"] .edu-meta,
 html[data-theme="zune"] .meta-row .label,
 html[data-theme="zune"] .sp-list dt { color: #A8A8B0; }
 html[data-theme="zune"] .exp-meta .org { color: #ECECEC; }
 html[data-theme="zune"] .chip { background: #2E2E33; border-color: #4A4A52; color: #E2E2E6; }
-html[data-theme="zune"] .edu-status { background: #1F3A22; color: #9BE59B; border-color: #3E7B43; }
-html[data-theme="zune"] .contact-links a { color: #ECECEC; }
-html[data-theme="zune"] .contact-links a + a { border-top-color: #3A3A40; }
 html[data-theme="zune"] .dm-cat summary::before { background: #121214; border-color: #6A6A72; color: #ECECEC; }
 html[data-theme="zune"] .dm-cat ul,
 html[data-theme="zune"] .dm-cat li::before { border-color: #55555C; }
@@ -57,7 +52,7 @@ html[data-theme="zune"] .group legend { color: #FF9A57; }
 /* ----- dialogs, tabs, explorer, bin ----- */
 html[data-theme="zune"] .tab-panels { background: #1F1F22; border-color: #3A3A40; }
 html[data-theme="zune"] .tabs [role="tab"] { background: linear-gradient(#34343A, #26262A); color: #D6D6DA; border-color: #3A3A40; }
-html[data-theme="zune"] .tabs [role="tab"][aria-selected="true"] { background: #1F1F22; color: #fff; box-shadow: inset 0 2px 0 #F26B21; }
+html[data-theme="zune"] .tabs [role="tab"][aria-selected="true"] { border-bottom-color: #1F1F22; background: #1F1F22; color: #fff; box-shadow: inset 0 2px 0 #F26B21; }
 html[data-theme="zune"] .ex-tree { background: linear-gradient(#2A2A2E, #18181A); }
 html[data-theme="zune"] .ex-tree h3 { background: linear-gradient(90deg, #3A3A40, #4A2A18); }
 html[data-theme="zune"] .ex-tree > ul { background: #232326; }
@@ -89,7 +84,7 @@ html[data-theme="zune"] .balloon, html[data-theme="zune"] .mascot-bubble { color
 html[data-theme="zune"] .balloon::after, html[data-theme="zune"] .mascot-bubble::after { border-top-color: #F26B21; }
 html[data-theme="zune"] .ctx-menu { background: #232326; border-color: #55555C; color: #ECECEC; }
 html[data-theme="zune"] .ctx-sep hr { border-top-color: #3A3A40; }
-html[data-theme="zune"] .vol-pop { color: #ECECEC; border-color: #55555C #0E0E10 #0E0E10 #55555C; }
+html[data-theme="zune"] .vol-pop { color: #ECECEC; border-color: #55555C; }
 
 /* ----- taskbar and Start menu ----- */
 html[data-theme="zune"] .taskbar { background: linear-gradient(#3A3A40 0%, #2A2A2E 8%, #1E1E21 100%); border-top-color: #4A4A52; }

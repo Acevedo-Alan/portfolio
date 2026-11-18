@@ -58,6 +58,9 @@
 <link rel="stylesheet" href="css/content.css">
 <link rel="stylesheet" href="css/apps/sysprops.css">
 <link rel="stylesheet" href="css/apps/explorer.css">
+<link rel="stylesheet" href="css/apps/experience.css">
+<link rel="stylesheet" href="css/apps/contact.css">
+<link rel="stylesheet" href="css/apps/education.css">
 <link rel="stylesheet" href="css/apps/devmanager.css">
 <link rel="stylesheet" href="css/apps/terminal.css">
 <link rel="stylesheet" href="css/apps/minesweeper.css">
@@ -66,6 +69,8 @@
 <link rel="stylesheet" href="css/apps/display.css">
 <link rel="stylesheet" href="css/apps/notepad.css">
 <link rel="stylesheet" href="css/apps/solitaire.css">
+<link rel="stylesheet" href="css/apps/doom.css">
+<link rel="stylesheet" href="css/apps/chess.css">
 <link rel="stylesheet" href="css/theme-zune.css">
 <link rel="stylesheet" href="css/responsive.css">
 <link rel="stylesheet" href="css/fallback.css">
@@ -86,6 +91,7 @@
       if (/^(bliss|autumn|azul|moon)$/.test(wp)) root.dataset.wallpaper = wp;
       if (/^(luna|zune)$/.test(th)) root.dataset.theme = th;
     } catch (e) { /* storage unavailable */ }
+    try { if (sessionStorage.getItem('portfolio-profile') === 'recruiter') root.dataset.profile = 'recruiter'; } catch (e) { /* no sessionStorage */ }
     window.addEventListener('error', fail);
     // Show the XP welcome screen once per browser session (skip with ?skip). It needs sessionStorage + http(s).
     try {
@@ -100,25 +106,59 @@
 
 <a href="#desktop" class="skip-link" data-i18n="skip-link">Saltar al escritorio</a>
 
-<!-- XP welcome screen: shown while <html class="welcome-pending"> (set by the boot guard in <head>;
-     js/shell/welcome.js clears it when the visitor clicks their user name). Text is translated like the rest. -->
-<div class="welcome" id="welcome" role="dialog" aria-modal="true" aria-labelledby="ws-title">
+<!-- XP welcome screen: the first thing every visitor sees. Shown while <html class="welcome-pending"> (set by the
+     boot guard in <head>); js/shell/welcome.js runs the log-on: pick a user, type the password (or enter as
+     the recruiter), fade to black, then fade in to the desktop with the startup chime. Text is translated like the rest. -->
+<div class="welcome" id="welcome" role="dialog" aria-modal="true" aria-labelledby="ws-title ws-sub">
   <div class="ws-top" aria-hidden="true"></div>
   <div class="ws-main">
     <div class="ws-left">
       <div class="ws-brand"><svg aria-hidden="true" focusable="false"><use href="#i-flag"/></svg><span id="ws-title" data-i18n="ws-title">Portfolio</span></div>
-      <p class="ws-sub">Alan Acevedo · Full Stack Developer</p>
-      <p class="ws-hint" data-i18n="ws-hint">Para comenzar, hacé clic en tu nombre de usuario.</p>
+      <p class="ws-sub" id="ws-sub">Alan Acevedo &ndash; Full Stack Developer</p>
+      <p class="ws-hint" data-i18n="ws-hint">Para comenzar, elegí tu usuario.</p>
     </div>
     <div class="ws-divider" aria-hidden="true"></div>
     <div class="ws-right">
-      <button type="button" class="ws-user" id="ws-user" data-i18n-label="ws-user-label" aria-label="Iniciar sesión como Alan Acevedo">
-        <span class="ws-tile" aria-hidden="true"></span><span class="ws-name">Alan Acevedo</span>
-      </button>
+      <ul class="ws-users">
+        <li class="ws-account">
+          <button type="button" class="ws-user" id="ws-user" aria-expanded="false" aria-controls="ws-pass" data-i18n-label="ws-user-label" aria-label="Iniciar sesión como Alan Acevedo">
+            <span class="ws-tile" aria-hidden="true"></span>
+            <span class="ws-who"><span class="ws-name">Alan Acevedo</span><span class="ws-role" data-i18n="ws-admin-sub"></span></span>
+          </button>
+          <form class="ws-pass" id="ws-pass" autocomplete="off" hidden>
+            <label for="ws-pwd" data-i18n="ws-pass-label"></label>
+            <div class="ws-pass-row">
+              <input id="ws-pwd" type="password" autocomplete="off" spellcheck="false" aria-describedby="ws-pass-hint ws-pass-err">
+              <button type="submit" class="ws-go" id="ws-go" data-i18n-label="ws-pass-go" aria-label="Iniciar sesión"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 12h14M12 5l7 7-7 7"/></svg></button>
+            </div>
+            <p class="ws-pass-hint" id="ws-pass-hint" data-i18n="ws-pass-hint"></p>
+            <p class="ws-pass-err" id="ws-pass-err" role="alert" hidden data-i18n="ws-pass-wrong"></p>
+          </form>
+        </li>
+        <li class="ws-account">
+          <button type="button" class="ws-user" id="ws-guest" data-i18n-label="ws-guest-label" aria-label="Entrar como Reclutador">
+            <span class="ws-tile ws-tile-guest" aria-hidden="true"></span>
+            <span class="ws-who"><span class="ws-name" data-i18n="ws-guest"></span><span class="ws-role" data-i18n="ws-guest-sub"></span></span>
+          </button>
+        </li>
+      </ul>
       <p class="ws-loading" id="ws-loading" role="status" hidden data-i18n="ws-loading">Cargando tu configuración personal…</p>
     </div>
   </div>
-  <div class="ws-bottom" aria-hidden="true"></div>
+  <div class="ws-bottom">
+    <button type="button" class="ws-off" id="ws-off"><span class="ws-off-btn" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.5v8"/><path d="M7.2 6.6a8 8 0 1 0 9.6 0"/></svg></span><span data-i18n="pw-turnoff">Apagar equipo</span></button>
+  </div>
+</div>
+<!-- Black layer for the fade out / fade in of the log-on, and the "powered off" screen of the Turn off easter egg. -->
+<div class="ws-curtain" id="ws-curtain" aria-hidden="true"></div>
+<div class="ws-offscreen" id="ws-offscreen" hidden>
+  <div class="ws-off-text" role="status">
+    <p data-i18n="ws-off-bye">Gracias por visitar mi portfolio.</p>
+    <p>&gt; email: <a href="mailto:acevedo.j.alan@gmail.com">acevedo.j.alan@gmail.com</a></p>
+    <p>&gt; github: <a href="https://github.com/Acevedo-Alan" target="_blank" rel="noopener">github.com/Acevedo-Alan</a></p>
+    <p>&gt; linkedin: <a href="https://linkedin.com/in/acevedo-alan" target="_blank" rel="noopener">linkedin.com/in/acevedo-alan</a></p>
+    <p class="ws-off-hint" data-i18n="pw-off-hint">Hacé clic o presioná una tecla para encender el equipo.</p>
+  </div>
 </div>
 
 <!-- Shown only when the app fails to start (see the boot guard in <head>); text is
@@ -184,9 +224,9 @@
             <div class="hero-role" data-i18n="role">Full Stack Developer — Java/Spring · React</div>
           </header>
           <dl class="sp-list">
-            <dt data-i18n="sp-user"></dt><dd>Alan Acevedo</dd>
-            <dt data-i18n="meta-location-label"></dt><dd>Santa Fe, Argentina</dd>
-            <dt data-i18n="sp-edu"></dt><dd><span data-i18n="edu-degree"></span> · IES Santa Fe</dd>
+            <dt><img class="sp-ico" src="imgs/xp-icons/user-accounts.png" alt="" aria-hidden="true" draggable="false"><span data-i18n="sp-user"></span></dt><dd>Alan Acevedo</dd>
+            <dt><img class="sp-ico" src="imgs/xp-icons/my-computer.png" alt="" aria-hidden="true" draggable="false"><span data-i18n="meta-location-label"></span></dt><dd>Santa Fe, Argentina</dd>
+            <dt><img class="sp-ico" src="imgs/xp-icons/certificate.png" alt="" aria-hidden="true" draggable="false"><span data-i18n="sp-edu"></span></dt><dd><span data-i18n="edu-degree"></span> · IES Santa Fe</dd>
           </dl>
           <fieldset class="group">
             <legend data-i18n="sp-desc"></legend>
@@ -197,15 +237,19 @@
         <div role="tabpanel" id="panel-tools" class="tab-panel" aria-labelledby="tab-tools" hidden>
           <fieldset class="group">
             <legend data-i18n="sp-tools-design"></legend>
-            <div class="chip-row"><span class="chip">Figma</span><span class="chip">Jira</span><span class="chip">Scrum</span><span class="chip">Postman</span></div>
+            <ul class="sp-checks"><li><div class="sp-check" role="checkbox" aria-checked="true" aria-readonly="true" tabindex="0" data-tool="figma"><span class="sp-box" aria-hidden="true"></span>Figma</div></li><li><div class="sp-check" role="checkbox" aria-checked="true" aria-readonly="true" tabindex="0" data-tool="jira"><span class="sp-box" aria-hidden="true"></span>Jira</div></li><li><div class="sp-check" role="checkbox" aria-checked="true" aria-readonly="true" tabindex="0" data-tool="scrum"><span class="sp-box" aria-hidden="true"></span>Scrum</div></li><li><div class="sp-check" role="checkbox" aria-checked="true" aria-readonly="true" tabindex="0" data-tool="postman"><span class="sp-box" aria-hidden="true"></span>Postman</div></li></ul>
           </fieldset>
           <fieldset class="group">
             <legend data-i18n="sp-tools-data"></legend>
-            <div class="chip-row"><span class="chip">PostgreSQL</span><span class="chip">MySQL</span><span class="chip">MySQL Workbench</span><span class="chip">DBeaver</span></div>
+            <ul class="sp-checks"><li><div class="sp-check" role="checkbox" aria-checked="true" aria-readonly="true" tabindex="0" data-tool="postgresql"><span class="sp-box" aria-hidden="true"></span>PostgreSQL</div></li><li><div class="sp-check" role="checkbox" aria-checked="true" aria-readonly="true" tabindex="0" data-tool="mysql"><span class="sp-box" aria-hidden="true"></span>MySQL</div></li><li><div class="sp-check" role="checkbox" aria-checked="true" aria-readonly="true" tabindex="0" data-tool="mysql-workbench"><span class="sp-box" aria-hidden="true"></span>MySQL Workbench</div></li><li><div class="sp-check" role="checkbox" aria-checked="true" aria-readonly="true" tabindex="0" data-tool="dbeaver"><span class="sp-box" aria-hidden="true"></span>DBeaver</div></li></ul>
           </fieldset>
           <fieldset class="group">
             <legend data-i18n="sp-tools-infra"></legend>
-            <div class="chip-row"><span class="chip">Git</span><span class="chip">GitHub</span><span class="chip">CI/CD</span><span class="chip">Docker</span><span class="chip">Nginx</span></div>
+            <ul class="sp-checks"><li><div class="sp-check" role="checkbox" aria-checked="true" aria-readonly="true" tabindex="0" data-tool="git"><span class="sp-box" aria-hidden="true"></span>Git</div></li><li><div class="sp-check" role="checkbox" aria-checked="true" aria-readonly="true" tabindex="0" data-tool="github"><span class="sp-box" aria-hidden="true"></span>GitHub</div></li><li><div class="sp-check" role="checkbox" aria-checked="true" aria-readonly="true" tabindex="0" data-tool="cicd"><span class="sp-box" aria-hidden="true"></span>CI/CD</div></li><li><div class="sp-check" role="checkbox" aria-checked="true" aria-readonly="true" tabindex="0" data-tool="docker"><span class="sp-box" aria-hidden="true"></span>Docker</div></li><li><div class="sp-check" role="checkbox" aria-checked="true" aria-readonly="true" tabindex="0" data-tool="nginx"><span class="sp-box" aria-hidden="true"></span>Nginx</div></li></ul>
+          </fieldset>
+          <fieldset class="group sp-desc-group">
+            <legend data-i18n="sp-desc"></legend>
+            <div class="sp-desc" id="sp-tool-desc" role="status" aria-live="polite"></div>
           </fieldset>
         </div>
 
@@ -216,10 +260,7 @@
           </fieldset>
           <fieldset class="group">
             <legend data-i18n="sp-skills"></legend>
-            <div class="chip-row">
-              <span class="chip">Spring Security · JWT · 2FA/OTP</span><span class="chip">PostgreSQL RLS</span>
-              <span class="chip">Server-Sent Events</span><span class="chip">PWA offline-first</span><span class="chip">React · TypeScript</span>
-            </div>
+            <ul class="sp-checks"><li><div class="sp-check" role="checkbox" aria-checked="true" aria-readonly="true"><span class="sp-box" aria-hidden="true"></span>Spring Security · JWT · 2FA/OTP</div></li><li><div class="sp-check" role="checkbox" aria-checked="true" aria-readonly="true"><span class="sp-box" aria-hidden="true"></span>PostgreSQL RLS</div></li><li><div class="sp-check" role="checkbox" aria-checked="true" aria-readonly="true"><span class="sp-box" aria-hidden="true"></span>Server-Sent Events</div></li><li><div class="sp-check" role="checkbox" aria-checked="true" aria-readonly="true"><span class="sp-box" aria-hidden="true"></span>PWA offline-first</div></li><li><div class="sp-check" role="checkbox" aria-checked="true" aria-readonly="true"><span class="sp-box" aria-hidden="true"></span>React · TypeScript</div></li></ul>
           </fieldset>
         </div>
 
@@ -261,48 +302,71 @@
 
   <!-- EXPERIENCIA -->
   <section id="win-experiencia">
-    <div class="win-body">
+    <!-- "Add or Remove Programs" pattern: a white list with grey stripes; a click expands the entry (accordion).
+         The toolbar above the address bar is built by windowManager (registry flag "toolbar"); js/apps/experience.js wires it. -->
+    <div class="win-body exp-body">
       <h2 class="sr-only">experiencia</h2>
-      <p class="box-subtitle" data-i18n="box-experiencia-subtitle"></p>
-
-      <div class="exp-item">
-        <div class="exp-head">
-          <div class="exp-title-row"><span class="exp-num">1.</span><h3 class="exp-title">RDAM — <span data-i18n="rdam-title"></span></h3></div>
-          <span class="exp-tag" data-i18n="rdam-tag"></span>
+      <p class="exp-caption" data-i18n="box-experiencia-subtitle"></p>
+      <ul class="exp-list" data-view="details">
+      <li class="exp-row" data-folder="RDAM">
+        <h3 class="exp-h">
+          <button type="button" class="exp-toggle" id="exp-b-rdam" aria-expanded="false" aria-controls="exp-p-rdam">
+            <span class="exp-pm" aria-hidden="true"></span>
+            <img class="exp-ico" src="imgs/xp-icons/certificate.png" alt="" aria-hidden="true" draggable="false">
+            <span class="exp-name"><span class="exp-title">RDAM — <span data-i18n="rdam-title"></span></span><span class="exp-sub">Poder Judicial de Santa Fe · Campus 2026 · i2T Software Factory</span></span>
+            <span class="exp-tag" data-i18n="rdam-tag"></span>
+          </button>
+        </h3>
+        <div class="exp-panel" id="exp-p-rdam" role="region" aria-labelledby="exp-b-rdam" hidden>
+          <dl class="exp-fields">
+            <dt data-i18n="exp-org"></dt>
+            <dd><div class="exp-field"><img src="imgs/xp-icons/briefcase.png" alt="" aria-hidden="true" draggable="false"><span>Poder Judicial de Santa Fe · Campus 2026 · i2T Software Factory</span></div></dd>
+            <dt data-i18n="exp-tech"></dt>
+            <dd><div class="exp-field"><img src="imgs/xp-icons/services.png" alt="" aria-hidden="true" draggable="false"><span>Java 17, Spring Boot 3, Spring Security 6, JWT · 2FA/OTP, PostgreSQL + RLS, React 18, Material UI, Tailwind CSS, Docker</span></div></dd>
+          </dl>
+          <ul class="exp-bullets" data-i18n-list="rdam-bullets"></ul>
         </div>
-        <div class="exp-meta"><span class="org">Poder Judicial de Santa Fe</span> · Campus 2026 · i2T Software Factory</div>
-        <ul class="exp-bullets" data-i18n-list="rdam-bullets"></ul>
-        <div class="chip-row">
-          <span class="chip">Java 17</span><span class="chip">Spring Boot 3</span><span class="chip">Spring Security 6</span>
-          <span class="chip">JWT · 2FA/OTP</span><span class="chip">PostgreSQL + RLS</span><span class="chip">React 18</span>
-          <span class="chip">Material UI</span><span class="chip">Tailwind CSS</span><span class="chip">Docker</span>
+      </li>
+      <li class="exp-row" data-folder="DOMUS+">
+        <h3 class="exp-h">
+          <button type="button" class="exp-toggle" id="exp-b-domus" aria-expanded="false" aria-controls="exp-p-domus">
+            <span class="exp-pm" aria-hidden="true"></span>
+            <img class="exp-ico" src="imgs/xp-icons/mobile-device.png" alt="" aria-hidden="true" draggable="false">
+            <span class="exp-name"><span class="exp-title">DOMUS+ — <span data-i18n="domus-title"></span></span><span class="exp-sub"><span data-i18n="domus-org"></span></span></span>
+            <span class="exp-tag" data-i18n="domus-tag"></span>
+          </button>
+        </h3>
+        <div class="exp-panel" id="exp-p-domus" role="region" aria-labelledby="exp-b-domus" hidden>
+          <dl class="exp-fields">
+            <dt data-i18n="exp-org"></dt>
+            <dd><div class="exp-field"><img src="imgs/xp-icons/briefcase.png" alt="" aria-hidden="true" draggable="false"><span><span data-i18n="domus-org"></span></span></div></dd>
+            <dt data-i18n="exp-tech"></dt>
+            <dd><div class="exp-field"><img src="imgs/xp-icons/services.png" alt="" aria-hidden="true" draggable="false"><span>React Native, TypeScript, Node.js, MySQL, Figma, Jira · Scrum</span></div></dd>
+          </dl>
+          <ul class="exp-bullets" data-i18n-list="domus-bullets"></ul>
         </div>
-      </div>
-
-      <div class="exp-item">
-        <div class="exp-head">
-          <div class="exp-title-row"><span class="exp-num">2.</span><h3 class="exp-title">DOMUS+ — <span data-i18n="domus-title"></span></h3></div>
-          <span class="exp-tag" data-i18n="domus-tag"></span>
+      </li>
+      <li class="exp-row" data-folder="Turnos-Medicos">
+        <h3 class="exp-h">
+          <button type="button" class="exp-toggle" id="exp-b-clinica" aria-expanded="false" aria-controls="exp-p-clinica">
+            <span class="exp-pm" aria-hidden="true"></span>
+            <img class="exp-ico" src="imgs/xp-icons/checklist.png" alt="" aria-hidden="true" draggable="false">
+            <span class="exp-name"><span class="exp-title"><span data-i18n="clinica-title"></span></span><span class="exp-sub"><span data-i18n="clinica-org"></span></span></span>
+            <span class="exp-tag" data-i18n="clinica-tag"></span>
+          </button>
+        </h3>
+        <div class="exp-panel" id="exp-p-clinica" role="region" aria-labelledby="exp-b-clinica" hidden>
+          <dl class="exp-fields">
+            <dt data-i18n="exp-org"></dt>
+            <dd><div class="exp-field"><img src="imgs/xp-icons/briefcase.png" alt="" aria-hidden="true" draggable="false"><span><span data-i18n="clinica-org"></span></span></div></dd>
+            <dt data-i18n="exp-tech"></dt>
+            <dd><div class="exp-field"><img src="imgs/xp-icons/services.png" alt="" aria-hidden="true" draggable="false"><span>Node.js, Express, MySQL, JWT</span></div></dd>
+          </dl>
+          <ul class="exp-bullets" data-i18n-list="clinica-bullets"></ul>
         </div>
-        <div class="exp-meta"><span class="org" data-i18n="domus-org"></span></div>
-        <ul class="exp-bullets" data-i18n-list="domus-bullets"></ul>
-        <div class="chip-row">
-          <span class="chip">React Native</span><span class="chip">TypeScript</span><span class="chip">Node.js</span>
-          <span class="chip">MySQL</span><span class="chip">Figma</span><span class="chip">Jira · Scrum</span>
-        </div>
-      </div>
-
-      <div class="exp-item">
-        <div class="exp-head">
-          <div class="exp-title-row"><span class="exp-num">3.</span><h3 class="exp-title" data-i18n="clinica-title"></h3></div>
-          <span class="exp-tag" data-i18n="clinica-tag"></span>
-        </div>
-        <div class="exp-meta"><span class="org" data-i18n="clinica-org"></span></div>
-        <ul class="exp-bullets" data-i18n-list="clinica-bullets"></ul>
-        <div class="chip-row">
-          <span class="chip">Node.js</span><span class="chip">Express</span><span class="chip">MySQL</span><span class="chip">JWT</span>
-        </div>
-      </div>
+      </li>
+      </ul>
+      <div class="exp-status" role="status" aria-live="polite"><span id="exp-status-text"></span></div>
     </div>
   </section>
 
@@ -361,28 +425,103 @@
 
   <!-- EDUCACION -->
   <section id="win-educacion">
-    <div class="win-body">
+    <!-- Static Explorer "Details" view: plain table, no script. The text is hardcoded Spanish; data-i18n only lets the language switch swap it. -->
+    <div class="win-body edu-body">
       <h2 class="sr-only">educación</h2>
-      <p class="box-subtitle" data-i18n="box-educacion-subtitle"></p>
-      <div class="edu-item">
-        <h3 class="edu-degree" data-i18n="edu-degree"></h3>
-        <div class="edu-org">IES Santa Fe</div>
-        <div class="edu-meta">Santa Fe, Argentina · <span data-i18n="edu-year"></span></div>
-        <span class="edu-status" data-i18n="edu-status"></span>
+      <div class="edu-view">
+        <table class="edu-table">
+          <thead>
+            <tr>
+              <th scope="col" data-i18n="ed-col-name">Nombre</th>
+              <th scope="col" data-i18n="ed-col-inst">Institución</th>
+              <th scope="col" data-i18n="ed-col-status">Estado</th>
+              <th scope="col" data-i18n="ed-col-type">Tipo</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="selected">
+              <td class="edu-name"><img src="imgs/xp-icons/certificate.png" alt="" width="16" height="16" draggable="false"><span data-i18n="edu-degree">Técnico Superior en Desarrollo de Software</span></td>
+              <td>IES Santa Fe</td>
+              <td data-i18n="ed-r1-status">En curso (3.º año)</td>
+              <td data-i18n="ed-r1-type">Carrera Terciaria</td>
+            </tr>
+            <tr>
+              <td class="edu-name"><img src="imgs/xp-icons/generic-document.png" alt="" width="16" height="16" draggable="false"><span data-i18n="ed-r2-name">Certificación de Inglés B1</span></td>
+              <td>freeCodeCamp</td>
+              <td data-i18n="ed-r2-status">Completado</td>
+              <td data-i18n="ed-r2-type">Certificado</td>
+            </tr>
+            <tr>
+              <td class="edu-name"><img src="imgs/xp-icons/services.png" alt="" width="16" height="16" draggable="false"><span>Microsoft Azure (AZ-204) &amp; C#.NET</span></td>
+              <td data-i18n="ed-r3-inst">Autoestudio</td>
+              <td data-i18n="ed-r3-status">En preparación</td>
+              <td data-i18n="ed-r3-type">Especialización</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </section>
 
   <!-- CONTACTO -->
   <section id="win-contacto">
-    <div class="win-body">
+    <!-- Contact "properties" sheet: a fieldset of read-only sunken fields (selectable, copyable) with XP buttons. js/apps/contact.js wires it. -->
+    <div class="win-body ct-body">
       <h2 class="sr-only">contacto</h2>
-      <p class="box-subtitle" data-i18n="box-contacto-subtitle"></p>
-      <div class="contact-links">
-        <a href="mailto:acevedo.j.alan@gmail.com"><span class="k">email</span> acevedo.j.alan@gmail.com</a>
-        <a href="https://github.com/Acevedo-Alan" target="_blank" rel="noopener"><span class="k">github</span> github.com/Acevedo-Alan</a>
-        <a href="https://linkedin.com/in/acevedo-alan" target="_blank" rel="noopener"><span class="k">linkedin</span> linkedin.com/in/acevedo-alan</a>
-      </div>
+      <fieldset class="ct-group">
+        <legend data-i18n="ct-legend"></legend>
+        <div class="ct-row" data-kind="email" data-href="mailto:acevedo.j.alan@gmail.com">
+          <img src="imgs/xp-icons/email.png" alt="" aria-hidden="true" draggable="false">
+          <label for="ct-email" data-i18n="ct-email"></label>
+          <input id="ct-email" class="ct-field" type="text" readonly value="acevedo.j.alan@gmail.com">
+          <span class="ct-actions">
+            <button type="button" class="btn-xp" data-act="copy" data-i18n="ct-copy"></button>
+            <button type="button" class="btn-xp" data-act="compose" data-i18n="ct-write"></button>
+          </span>
+        </div>
+        <div class="ct-row" data-kind="github" data-href="https://github.com/Acevedo-Alan">
+          <img src="imgs/xp-icons/command-prompt.png" alt="" aria-hidden="true" draggable="false">
+          <label for="ct-github" data-i18n="ct-github"></label>
+          <input id="ct-github" class="ct-field" type="text" readonly value="github.com/Acevedo-Alan">
+          <span class="ct-actions">
+            <button type="button" class="btn-xp" data-act="copy" data-i18n="ct-copy"></button>
+            <button type="button" class="btn-xp" data-act="visit" data-i18n="ct-visit"></button>
+          </span>
+        </div>
+        <div class="ct-row" data-kind="linkedin" data-href="https://linkedin.com/in/acevedo-alan">
+          <img src="imgs/xp-icons/user-accounts.png" alt="" aria-hidden="true" draggable="false">
+          <label for="ct-linkedin" data-i18n="ct-linkedin"></label>
+          <input id="ct-linkedin" class="ct-field" type="text" readonly value="linkedin.com/in/acevedo-alan">
+          <span class="ct-actions">
+            <button type="button" class="btn-xp" data-act="copy" data-i18n="ct-copy"></button>
+            <button type="button" class="btn-xp" data-act="visit" data-i18n="ct-visit"></button>
+          </span>
+        </div>
+      </fieldset>
+      <div class="ct-status" role="status" aria-live="polite"><span id="ct-status-text"></span></div>
+    </div>
+  </section>
+
+  <!-- OUTLOOK EXPRESS-STYLE COMPOSER -->
+  <section id="win-mail">
+    <div class="win-body ml-body">
+      <h2 class="sr-only" data-i18n="box-mail"></h2>
+      <form id="ml-form" class="ml-form" autocomplete="off" novalidate>
+        <div class="ml-toolbar" role="toolbar" data-i18n-label="tb-label">
+          <button type="submit" class="ml-send"><img src="imgs/xp-icons/email.png" alt="" aria-hidden="true" draggable="false"><span data-i18n="ml-send"></span></button>
+        </div>
+        <div class="ml-head">
+          <label for="ml-to" data-i18n="ml-to"></label>
+          <input id="ml-to" class="ml-in" type="text" readonly value="Alan Acevedo &lt;acevedo.j.alan@gmail.com&gt;">
+          <label for="ml-from" data-i18n="ml-from"></label>
+          <input id="ml-from" class="ml-in" type="email" autocomplete="email">
+          <label for="ml-subject" data-i18n="ml-subject"></label>
+          <input id="ml-subject" class="ml-in" type="text" maxlength="150">
+        </div>
+        <label for="ml-body" class="sr-only" data-i18n="ml-body"></label>
+        <textarea id="ml-body" class="ml-text" maxlength="4000"></textarea>
+        <div class="ml-status" role="status" aria-live="polite"><span id="ml-status-text"></span></div>
+      </form>
     </div>
   </section>
 
@@ -409,6 +548,8 @@
     </div>
   </section>
   <section id="win-solitaire"><div class="win-body sol-body"></div></section>
+  <section id="win-doom"><div class="win-body doom-body"></div></section>
+  <section id="win-chess"><div class="win-body chess-body"></div></section>
   <section id="win-display"><div class="win-body sp-body dp-body"></div></section>
 
 </main>
@@ -453,16 +594,21 @@
     <strong>Alan Acevedo</strong>
   </div>
   <div class="sm-body">
-    <ul class="sm-left" id="start-apps"></ul>
+    <div class="sm-leftcol">
+      <ul class="sm-left" id="start-apps"></ul>
+      <button type="button" class="sm-all" id="sm-all" aria-expanded="false">
+        <span data-i18n="sm-all">Todos los programas</span>
+        <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="9" fill="#2E9B2E" stroke="#fff" stroke-width="1.4"/><path d="M5.5 10h8M10 6l4 4-4 4" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
     <ul class="sm-right">
-      <li><a role="menuitem" href="https://github.com/Acevedo-Alan" target="_blank" rel="noopener">GitHub</a></li>
-      <li><a role="menuitem" href="https://linkedin.com/in/acevedo-alan" target="_blank" rel="noopener">LinkedIn</a></li>
-      <li><a role="menuitem" href="mailto:acevedo.j.alan@gmail.com">Email</a></li>
+      <li><a role="menuitem" href="https://github.com/Acevedo-Alan" target="_blank" rel="noopener"><img src="imgs/xp-icons/command-prompt.png" alt="" aria-hidden="true" draggable="false"><span>GitHub</span></a></li>
+      <li><a role="menuitem" href="https://linkedin.com/in/acevedo-alan" target="_blank" rel="noopener"><img src="imgs/xp-icons/user-accounts.png" alt="" aria-hidden="true" draggable="false"><span>LinkedIn</span></a></li>
+      <li><a role="menuitem" href="mailto:acevedo.j.alan@gmail.com"><img src="imgs/xp-icons/email.png" alt="" aria-hidden="true" draggable="false"><span>Email</span></a></li>
       <li><button type="button" role="menuitem" id="mascot-toggle"></button></li>
     </ul>
   </div>
   <div class="sm-foot">
-    <button type="button" id="close-all" role="menuitem" data-i18n="close-all"></button>
     <button type="button" id="logoff" role="menuitem"><img src="imgs/xp-icons/logout.png" alt="" aria-hidden="true" draggable="false"><span data-i18n="sm-logoff"></span></button>
     <button type="button" id="turnoff" role="menuitem"><img src="imgs/xp-icons/power.png" alt="" aria-hidden="true" draggable="false"><span data-i18n="sm-turnoff"></span></button>
   </div>

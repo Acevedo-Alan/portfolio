@@ -31,6 +31,8 @@
   .mp-info { padding: 8px 12px 0; }
   .mp-tracks { margin: 6px 12px 32px; }
   .mp-deck { padding: 8px 12px 12px; }
+  .mp-ctrls { gap: 6px; }
+  .mp-toggle { width: 26px; height: 26px; }
   .mp-vol-wrap { margin-left: 4px; }
   .mp-vol { width: 64px; }
 }

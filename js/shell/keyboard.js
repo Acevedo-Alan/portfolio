@@ -61,7 +61,7 @@ function endSwitcher(commit) {
 
 /** True when something that should take Escape first is showing. */
 function escapeBelongsElsewhere() {
-  return !!(document.querySelector('.ctx-menu, .xp-backdrop, .power-backdrop, .power-screen, .bsod, .welcome, #start-menu:not([hidden]), #vol-pop:not([hidden]), #mascot-bubble:not([hidden])'));
+  return !!(document.querySelector('.ctx-menu, .xp-backdrop, .power-backdrop, .power-screen, .bsod, .welcome, .sol-dd:not([hidden]), .sol-dialog, .chess-promo:not([hidden]), .chess-over:not([hidden]), .xtb-menu:not([hidden]), #start-menu:not([hidden]), #vol-pop:not([hidden]), #mascot-bubble:not([hidden])'));
 }
 
 // ---------- Desktop icon navigation ----------
