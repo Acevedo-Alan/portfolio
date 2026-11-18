@@ -5,16 +5,19 @@
   --mp-bg1: #0A2A72; --mp-bg2: #2F7BE8;
   --mp-glow: rgba(90, 235, 120, .8); --mp-orb-a: #C9FFC4; --mp-orb-b: #3FD65A; --mp-orb-c: #17863A;
   --mp-vis-a: #5CCBFF; --mp-vis-b: #2B6BFF; --mp-vis-c: #D4F0FF;
+  --mp-acc-a: #9BDBFF; --mp-acc-b: #2B7BFF; --mp-acc-edge: #1B3A8A; --mp-acc-lit: #8FC0FF; --mp-acc-lit-b: #3A78E0;
 }
 .window.skin[data-skin="silver"] {
   --mp-bg1: #2E3856; --mp-bg2: #6F7DA3;
   --mp-glow: rgba(120, 190, 255, .85); --mp-orb-a: #DCEBFF; --mp-orb-b: #5C9CF0; --mp-orb-c: #2A5FB8;
   --mp-vis-a: #EAF0FB; --mp-vis-b: #9FB4DC; --mp-vis-c: #FFFFFF;
+  --mp-acc-a: #9BDBFF; --mp-acc-b: #2B7BFF; --mp-acc-edge: #1B3A8A; --mp-acc-lit: #8FC0FF; --mp-acc-lit-b: #3A78E0;
 }
 .window.skin[data-skin="green"] {
   --mp-bg1: #0B4A2C; --mp-bg2: #2F9A5C;
   --mp-glow: rgba(255, 214, 90, .85); --mp-orb-a: #FFF3C2; --mp-orb-b: #FFC93C; --mp-orb-c: #C98A0A;
   --mp-vis-a: #8DFFA8; --mp-vis-b: #1FC75A; --mp-vis-c: #E8FFEE;
+  --mp-acc-a: #FFE79A; --mp-acc-b: #E0A21C; --mp-acc-edge: #7A5200; --mp-acc-lit: #FFE08A; --mp-acc-lit-b: #D99A10;
 }
 
 /* Non-rectangular chrome: big asymmetric corner radii instead of the XP frame */
@@ -110,7 +113,7 @@
 }
 .mp-seek::before { content: ""; position: absolute; inset: -7px 0; }       /* a taller hit area than the thin bar */
 .mp-seek.seekable { cursor: var(--hand); }
-.mp-seek i { display: block; width: 0; height: 100%; background: linear-gradient(#9BDBFF, #2B7BFF); }
+.mp-seek i { display: block; width: 0; height: 100%; background: linear-gradient(var(--mp-acc-a, #9BDBFF), var(--mp-acc-b, #2B7BFF)); }
 
 .mp-ctrls { display: flex; align-items: center; justify-content: center; gap: 12px; color: #2A3556; }
 .mp-round {
@@ -130,7 +133,7 @@
   background: none; border: 1px solid transparent; border-radius: 50%;
 }
 .mp-toggle:hover { background: rgba(255, 255, 255, .45); }
-.mp-toggle[aria-pressed="true"] { color: #fff; background: linear-gradient(#5C9CF0, #2A5FB8); border-color: #1B3A8A; box-shadow: inset 0 1px 2px rgba(0, 0, 0, .35); }
+.mp-toggle[aria-pressed="true"] { color: #fff; background: linear-gradient(var(--mp-acc-a, #5C9CF0), var(--mp-acc-b, #2A5FB8)); border-color: var(--mp-acc-edge, #1B3A8A); box-shadow: inset 0 1px 2px rgba(0, 0, 0, .35); }
 .mp-toggle:focus-visible { outline: 2px dotted #1B3A8A; outline-offset: 3px; }
 
 /* The big glass orb breaks out above the deck */
@@ -181,26 +184,96 @@
 
 /* ----- Sidebar tools: five round buttons wrap to two rows ----- */
 .mp-side-tools { flex-wrap: wrap; max-width: 128px; }
-.mp-mini[aria-pressed="true"] { background: linear-gradient(#8FC0FF, #3A78E0); border-color: #fff; }
+.mp-mini[aria-pressed="true"] { background: linear-gradient(var(--mp-acc-lit, #8FC0FF), var(--mp-acc-lit-b, #3A78E0)); border-color: #fff; }
 
 /* ----- Speed / EQ / effects panel (replaces the playlist while open) ----- */
-.mp-fx { flex: 0 1 auto; min-height: 0; margin: 6px 18px 34px 6px; padding: 2px 8px 8px; overflow: auto; border: 1px solid rgba(255, 255, 255, .4); border-radius: 3px; background: rgba(4, 18, 70, .42); font-size: 12px; }
-.mp-fx[hidden] { display: none; }
-.mp-fs { margin: 6px 0 0; padding: 4px 8px 8px; min-width: 0; border: 1px solid rgba(255, 255, 255, .28); border-radius: 3px; }
-.mp-fs legend { padding: 0 4px; color: #D6E4FF; font-size: 11px; }
+.mp-fx { flex: 0 1 auto; min-height: 0; margin: 6px 18px 34px 6px; padding: 2px 8px 8px; overflow: visible; border: 1px solid rgba(255, 255, 255, .4); border-radius: 3px; background: rgba(4, 18, 70, .42); font-size: 12px; }
+.mp-fx[hidden], .mp-fs[hidden] { display: none; }
+.mp-fs { margin: 6px 0 0; padding: 0; min-width: 0; border: 0; }
+.mp-fs legend { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }   /* names the group for screen readers; the pager shows it */
+/* The < > pager in the corner, like WMP's Enhancements: one page at a time, so nothing scrolls. */
+.mp-fx-nav { display: flex; align-items: center; gap: 6px; padding: 3px 0 1px; }
+.mp-fx-name { flex: 1; min-width: 0; color: #fff; font-weight: 700; text-shadow: 0 1px 2px rgba(0, 0, 0, .5); }
+.mp-arrow {
+  width: 20px; height: 18px; padding: 0; display: grid; place-items: center; color: #1B3A8A; font-size: 8px; line-height: 1; cursor: var(--hand);
+  background: linear-gradient(#fff, #D4DCEC 55%, #A9B5CE); border: 1px solid #5C6A85; border-radius: 2px;
+}
+.mp-arrow:hover { filter: brightness(1.06); }
+.mp-arrow:active { background: linear-gradient(#A9B5CE, #D4DCEC); box-shadow: inset 1px 1px 2px rgba(0, 0, 0, .35); }
 .mp-row { display: grid; grid-template-columns: 82px minmax(0, 1fr) auto; gap: 8px; align-items: center; margin: 3px 0; }
 .mp-check { display: flex; align-items: center; gap: 6px; margin-top: 4px; }
-.mp-fx input[type="range"] { width: 100%; accent-color: #7DB6FF; cursor: var(--hand); }
-.mp-select { margin-bottom: 6px; padding: 2px 4px; color: #000; font: 12px Tahoma, "Segoe UI", sans-serif; background: #fff; border: 1px solid #7F9DB9; }
-.mp-eq { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 2px; text-align: center; }
-.mp-eq label { display: grid; justify-items: center; gap: 2px; }
-/* writing-mode makes the slider vertical in current browsers; the old non-standard slider-vertical appearance is gone, and stacking both breaks dragging. */
-.mp-eq input { writing-mode: vertical-lr; direction: rtl; width: 18px; height: 84px; margin: 0; touch-action: none; }
+
+/* Sliders: a hairline sunken groove with a small rectangular bevelled thumb (logical sizes, so the vertical EQ bands follow the same rules). */
+.mp-fx input[type="range"] { -webkit-appearance: none; appearance: none; background: none; width: 100%; height: 18px; margin: 0; cursor: var(--hand); }
+.mp-fx input[type="range"]::-webkit-slider-runnable-track {
+  block-size: 6px; background: rgba(0, 0, 0, .7); border: 1px solid; border-color: #000 rgba(255, 255, 255, .45) rgba(255, 255, 255, .45) #000; border-radius: 0;
+  box-shadow: inset 1px 1px 1px rgba(0, 0, 0, .9);
+}
+.mp-fx input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none; inline-size: 9px; block-size: 18px; margin-block-start: -5px; border-radius: 1px;
+  background: linear-gradient(90deg, #fff, #C9D0DD 45%, #8F9BB3); border: 1px solid #3B4663; border-top-color: #fff; border-left-color: #fff;
+  box-shadow: 1px 1px 0 #1B2238, inset -1px -1px 0 rgba(0, 0, 0, .25);
+}
+.mp-fx input[type="range"]::-moz-range-track { height: 3px; background: rgba(0, 0, 0, .7); border: 1px solid; border-color: #000 rgba(255, 255, 255, .45) rgba(255, 255, 255, .45) #000; border-radius: 0; }
+.mp-fx input[type="range"]::-moz-range-thumb {
+  width: 9px; height: 18px; border-radius: 1px; background: linear-gradient(90deg, #fff, #C9D0DD 45%, #8F9BB3);
+  border: 1px solid #3B4663; border-top-color: #fff; border-left-color: #fff; box-shadow: 1px 1px 0 #1B2238;
+}
+.mp-fx input[type="range"]:focus-visible { outline: 1px dotted #fff; outline-offset: 2px; }
+
+/* Combo box: Win32 sunken rectangle with the square Luna arrow button. */
+.mp-select {
+  -webkit-appearance: none; appearance: none; margin: 0; padding: 2px 22px 2px 4px; min-width: 130px; color: #000; font: 12px Tahoma, "Segoe UI", sans-serif; border-radius: 0; cursor: var(--hand);
+  border: 2px solid; border-color: #7A8499 #fff #fff #7A8499; outline: 1px solid #1C2A4F; outline-offset: -1px;
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='17' height='17'%3E%3Crect x='.5' y='.5' width='16' height='16' rx='2' fill='%23C5D6FC' stroke='%23fff'/%3E%3Cpath d='M4 6.5h9L8.5 11.5z' fill='%234D6185'/%3E%3C/svg%3E") no-repeat right 0 center / 17px 17px;
+}
+.mp-select option { color: #000; background: #fff; }
+.mp-combo { position: relative; justify-self: start; width: 140px; }
+.mp-combo-btn { display: block; width: 100%; margin: 0; text-align: left; white-space: nowrap; overflow: hidden; }
+.mp-combo-list {
+  position: absolute; left: 0; right: 0; top: 100%; z-index: 30; margin: 0; padding: 0; list-style: none;
+  background: #fff; border: 1px solid #000; border-radius: 0; box-shadow: none; color: #000; font: 12px/1.3 Tahoma, "Segoe UI", sans-serif;
+}
+.mp-combo-list[hidden] { display: none; }
+.mp-combo-list li { padding: 0 4px; line-height: 15px; cursor: var(--hand); white-space: nowrap; }
+.mp-combo-list li:hover { background: #316AC5; color: #fff; }
+.mp-combo-list:not(:hover) li[aria-selected="true"] { background: #316AC5; color: #fff; }
+
+/* Checkbox: classic sunken 3D square. */
+.mp-check input {
+  -webkit-appearance: none; appearance: none; flex: none; width: 13px; height: 13px; margin: 0; background: #fff; border-radius: 0; cursor: var(--hand);
+  border: 1px solid; border-color: #7A8499 #fff #fff #7A8499; box-shadow: inset 1px 1px 0 #3B4663;
+}
+.mp-check input:checked { background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='9'%3E%3Cpath d='M1 4.5l2.5 2.5L8 1.5' fill='none' stroke='%2321A121' stroke-width='2'/%3E%3C/svg%3E") no-repeat center; }
+.mp-check input:focus-visible { outline: 1px dotted #fff; outline-offset: 2px; }
+
+.mp-eq-wrap { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px; margin-top: 10px; }
+.mp-eq-scale { display: flex; flex-direction: column; justify-content: space-between; height: 84px; color: #C2D6FF; font-size: 9px; line-height: 1; text-align: right; }
+.mp-eq { position: relative; display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 2px; text-align: center; }
+.mp-eq::before { content: ""; position: absolute; left: 0; right: 0; top: 42px; height: 1px; background: rgba(255, 255, 255, .35); pointer-events: none; }   /* 0 dB */
+.mp-eq label { position: relative; display: grid; justify-items: center; gap: 2px; }
+/* writing-mode makes the slider vertical in current browsers (orient is the Firefox spelling); the old slider-vertical appearance is gone. */
+.mp-eq input[type="range"] { writing-mode: vertical-lr; direction: rtl; width: 18px; height: 84px; touch-action: none; }
+.mp-eq input[type="range"]::-moz-range-thumb { width: 18px; height: 9px; }
+.mp-eq input[type="range"] { position: relative; z-index: 1; }
+.mp-eq input[type="range"]::-webkit-slider-runnable-track, .mp-eq input[type="range"]::-moz-range-track { background: transparent; border-color: transparent; box-shadow: none; }
+.mp-eq label::before {                                   /* the groove: near-black, sunken (shadow top-left, faint light bottom-right) */
+  content: ""; position: absolute; top: 0; left: 50%; width: 6px; height: 84px; margin-left: -3px; box-sizing: border-box;
+  background: #000; border: 1px solid; border-color: #000 rgba(255, 255, 255, .45) rgba(255, 255, 255, .45) #000;
+  box-shadow: inset 1px 1px 2px rgba(0, 0, 0, .9), 1px 1px 0 rgba(255, 255, 255, .2);   /* inner shade + a faint outer highlight for the bevel */
+}
 .mp-fx, .mp-screen, .mp-seek { user-select: none; -webkit-user-select: none; -webkit-user-drag: none; }
 .mp-canvas { -webkit-user-drag: none; -webkit-touch-callout: none; }
 .mp-eq span { font-size: 10px; color: #C2D6FF; }
 .mp-reset { margin-top: 6px; }
-.mp-fx select:focus-visible, .mp-fx input:focus-visible, .mp-fx button:focus-visible { outline: 2px dotted #fff; outline-offset: 1px; }
+.mp-fx select:focus-visible, .mp-fx button:focus-visible { outline: 2px dotted #fff; outline-offset: 1px; }
+
+/* Classic yellow tooltip on the round tool buttons (their icons are small): #FFFFE1, 1px black border. */
+.mp-mini { position: relative; }
+.mp-mini:hover::after, .mp-mini:focus-visible::after {
+  content: attr(aria-label); position: absolute; left: 0; bottom: calc(100% + 6px); z-index: 20; width: max-content; max-width: 190px; padding: 2px 5px;
+  color: #000; background: #FFFFE1; border: 1px solid #000; font: 11px/1.3 Tahoma, "Segoe UI", sans-serif; text-align: left; pointer-events: none;
+}
 .mp-fx:not([hidden]) ~ .mp-tracks { display: none; }
 
 /* ----- Playlist reordering ----- */
@@ -219,3 +292,25 @@
 .window.mini .mp-ctrls { gap: 8px; }
 
 @media (prefers-reduced-motion: reduce) { .mp-play { transform: none; } }
+
+/* ----- Full screen (Alt+Enter, double-click the screen): the visualizer fills the display, the controls float and fade when idle ----- */
+.mp-stage.full { position: relative; padding: 0; background: #000; }
+.mp-stage.full .mp-screen { margin: 0; border-radius: 0; flex: 1; min-height: 0; box-shadow: none; }
+.mp-stage.full .mp-fx, .mp-stage.full .mp-tracks { display: none !important; }
+.mp-fs-only { display: none; align-items: center; gap: 2px; margin-left: 10px; }
+.mp-stage.full .mp-fs-only { display: flex; }
+.mp-stage.full .mp-info {                                  /* a dark vignette behind the title and clock so they read over bright visuals */
+  position: absolute; top: 0; left: 0; right: 0; z-index: 3; padding: 18px 28px 56px; transition: opacity .4s;
+  background: linear-gradient(rgba(0, 0, 0, .6), transparent); text-shadow: 0 1px 3px #000, 0 0 8px rgba(0, 0, 0, .8);
+}
+.mp-stage.full .mp-deck {
+  position: absolute; left: 50%; bottom: 28px; z-index: 3; width: min(820px, 94%); transform: translateX(-50%); padding: 14px 24px;
+  border: 1px solid rgba(0, 0, 0, .85); border-radius: 14px; transition: opacity .4s;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .25), 0 8px 24px rgba(0, 0, 0, .7), 0 2px 6px rgba(0, 0, 0, .6);
+}
+.mp-stage.full .mp-seek { border-radius: 13px 13px 0 0; }
+.mp-stage.full.idle .mp-info, .mp-stage.full.idle .mp-deck { opacity: 0; pointer-events: none; }
+.mp-stage.full.idle, .mp-stage.full.idle .mp-screen { cursor: none; }
+
+/* ----- Dropping an audio file onto the window ----- */
+.mp.dropping .mp-screen { outline: 2px dashed #fff; outline-offset: -8px; }

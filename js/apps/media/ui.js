@@ -36,6 +36,8 @@ const cutoffHz = (v) => 200 * 110 ** (v / 100);     // 0..100 slider → 200 Hz.
 const BADGE_MS = 2200;
 const ERROR_BADGE_MS = 4500;
 const VOLUME_STEP = 5;
+const IDLE_MS = 2500;                      // full screen: controls hide after this long without input
+const AUDIO_EXT = /\.(mp3|wav|ogg|oga|opus|m4a|aac|flac|weba)$/i;
 
 // The sidebar doubles as portfolio navigation. `open` = window to open;
 // `action: 'burn'` launches the CD-burning wizard that delivers the résumé.
@@ -60,6 +62,10 @@ const ICONS = {
   fx: svg('<path d="M5 3v18M12 3v18M19 3v18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><rect x="2.5" y="13" width="5" height="3.4" rx="1"/><rect x="9.5" y="6" width="5" height="3.4" rx="1"/><rect x="16.5" y="10" width="5" height="3.4" rx="1"/>', 18),
   kaoss: svg('<rect x="3.5" y="3.5" width="17" height="17" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 3.5v17M3.5 12h17" stroke="currentColor" stroke-width="1.2"/><circle cx="15.5" cy="8.5" r="2.4"/>', 18),
   mini: svg('<rect x="3" y="4" width="18" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="12" y="12" width="7" height="6" rx="1"/>', 18),
+  full: svg('<path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>', 18),
+  left: svg('<path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>', 18),
+  right: svg('<path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>', 18),
+  unfull: svg('<path d="M9 4v5H4M20 9h-5V4M15 20v-5h5M4 15h5v5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>', 18),
   skin: svg('<circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="9" cy="10" r="1.6"/><circle cx="14.5" cy="9" r="1.6"/><circle cx="15" cy="14.5" r="1.6"/>', 18),
 };
 
@@ -109,6 +115,7 @@ export function mount() {
           <button type="button" class="mp-mini" data-act="fx" aria-pressed="false" data-i18n-label="mp-fx">${ICONS.fx}</button>
           <button type="button" class="mp-mini" data-act="kaoss" aria-pressed="${kaoss}" data-i18n-label="mp-kaoss">${ICONS.kaoss}</button>
           <button type="button" class="mp-mini" data-act="mini" aria-pressed="false" data-i18n-label="mp-mini">${ICONS.mini}</button>
+          <button type="button" class="mp-mini" data-act="full" aria-pressed="false" data-i18n-label="mp-full">${ICONS.full}</button>
         </div>
       </nav>
       <div class="mp-stage">
@@ -124,21 +131,38 @@ export function mount() {
           <span class="mp-time" id="mp-time">00:00</span>
         </div>
         <div class="mp-fx" hidden>
-          <fieldset class="mp-fs">
+          <div class="mp-fx-nav">
+            <button type="button" class="mp-arrow" data-act="fx-prev" data-i18n-label="mp-fx-prev">&#9664;</button>
+            <span class="mp-fx-name" id="mp-fx-name" aria-live="polite"></span>
+            <button type="button" class="mp-arrow" data-act="fx-next" data-i18n-label="mp-fx-next">&#9654;</button>
+          </div>
+          <fieldset class="mp-fs" data-page="mp-speed-title">
             <legend data-i18n="mp-speed-title"></legend>
             <label class="mp-row"><span data-i18n="mp-speed"></span><input type="range" id="mp-speed" min="50" max="200" step="1"><output id="mp-speed-out"></output></label>
             <label class="mp-check"><input type="checkbox" id="mp-keep"><span data-i18n="mp-keep"></span></label>
           </fieldset>
-          <fieldset class="mp-fs">
+          <fieldset class="mp-fs" data-page="mp-eq" hidden>
             <legend data-i18n="mp-eq"></legend>
-            <select id="mp-preset" class="mp-select" data-i18n-label="mp-eq">
-              ${[...Object.keys(EQ_PRESETS), 'custom'].map((name) => `<option value="${name}" data-i18n="mp-eq-${name}"></option>`).join('')}
-            </select>
-            <div class="mp-eq">
-              ${EQ_FREQS.map((f, i) => `<label><input type="range" class="mp-band" data-band="${i}" min="-12" max="12" step="1" aria-label="${f >= 1000 ? f / 1000 + ' kHz' : f + ' Hz'}"><span>${f >= 1000 ? f / 1000 + 'k' : f}</span></label>`).join('')}
+            <div class="mp-row">
+              <span id="mp-preset-lbl" data-i18n="mp-preset-label"></span>
+              <div class="mp-combo" id="mp-combo">
+                <button type="button" class="mp-select mp-combo-btn" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="mp-preset-lbl mp-combo-val"><span id="mp-combo-val"></span></button>
+                <ul class="mp-combo-list" role="listbox" aria-labelledby="mp-preset-lbl" hidden>
+                  ${[...Object.keys(EQ_PRESETS), 'custom'].map((name) => `<li role="option" data-value="${name}" data-i18n="mp-eq-${name}"></li>`).join('')}
+                </ul>
+                <select id="mp-preset" hidden>
+                  ${[...Object.keys(EQ_PRESETS), 'custom'].map((name) => `<option value="${name}"></option>`).join('')}
+                </select>
+              </div>
+            </div>
+            <div class="mp-eq-wrap">
+              <div class="mp-eq-scale" aria-hidden="true"><span>+12 dB</span><span>0</span><span>&minus;12 dB</span></div>
+              <div class="mp-eq">
+                ${EQ_FREQS.map((f, i) => `<label><input type="range" class="mp-band" orient="vertical" data-band="${i}" min="-12" max="12" step="1" aria-label="${f >= 1000 ? f / 1000 + ' kHz' : f + ' Hz'}"><span>${f >= 1000 ? f / 1000 + 'k' : f}</span></label>`).join('')}
+              </div>
             </div>
           </fieldset>
-          <fieldset class="mp-fs">
+          <fieldset class="mp-fs" data-page="mp-fx-title" hidden>
             <legend data-i18n="mp-fx-title"></legend>
             <label class="mp-row"><span data-i18n="mp-reverb"></span><input type="range" id="mp-reverb" min="0" max="100"></label>
             <label class="mp-row"><span data-i18n="mp-echo"></span><input type="range" id="mp-echo" min="0" max="100"></label>
@@ -151,7 +175,7 @@ export function mount() {
           <ol class="mp-list" data-i18n-label="mp-playlist"></ol>
           <div class="mp-tracks-foot">
             <button type="button" class="mp-open" data-act="open-file" data-i18n="mp-open-file"></button>
-            <input type="file" id="mp-file" accept="audio/*" hidden>
+            <input type="file" id="mp-file" accept="audio/*" multiple hidden>
           </div>
         </div>
         <div class="mp-deck">
@@ -164,6 +188,11 @@ export function mount() {
             <button type="button" class="mp-round" data-act="next" data-i18n-label="mp-next">${ICONS.next}</button>
             <button type="button" class="mp-toggle" data-act="repeat" aria-pressed="${repeat}" data-i18n-label="mp-repeat">${ICONS.repeat}</button>
             <label class="mp-vol-wrap">${ICONS.speaker}<input type="range" class="mp-vol" min="0" max="100" value="70" data-i18n-label="mp-volume"></label>
+            <span class="mp-fs-only">
+              <button type="button" class="mp-toggle" data-act="vis-prev" data-i18n-label="mp-vis-prev">${ICONS.left}</button>
+              <button type="button" class="mp-toggle" data-act="vis" data-i18n-label="mp-vis-next">${ICONS.right}</button>
+              <button type="button" class="mp-toggle" data-act="full" data-i18n-label="mp-full-exit">${ICONS.unfull}</button>
+            </span>
           </div>
         </div>
       </div>
@@ -336,6 +365,20 @@ export function mount() {
     seek.classList.toggle('seekable', player.seekable);
   }
 
+  // Media Session: the OS media widget and the keyboard's media keys (play/pause, next, previous, stop) drive this player.
+  const session = 'mediaSession' in navigator ? navigator.mediaSession : null;
+  let sessionLabel = null;
+  function syncSession() {
+    if (!session) return;
+    const item = player.track ? tracks[index] : null;
+    const label = item ? trackLabel(item) : null;
+    if (label !== sessionLabel) {
+      sessionLabel = label;
+      session.metadata = item && window.MediaMetadata ? new MediaMetadata({ title: item.name, artist: item.artist || 'Media Player', album: 'Portfolio' }) : null;
+    }
+    session.playbackState = !item ? 'none' : player.playing ? 'playing' : 'paused';
+  }
+
   function sync() {
     $('#mp-title', root).textContent = player.track ? `${String(index + 1).padStart(2, '0')}. ${trackLabel(tracks[index])}` : t('mp-stopped');
     $('#mp-sub', root).textContent = player.track && player.track.src ? t('mp-sub-file') : t('mp-sub');
@@ -345,6 +388,7 @@ export function mount() {
     toggleBtn.setAttribute('data-i18n-label', player.playing ? 'mp-pause' : 'mp-play');
     translate(toggleBtn.parentElement);
     updateReadouts();
+    syncSession();
   }
 
   function showBadge(text, ms = BADGE_MS) {
@@ -396,6 +440,13 @@ export function mount() {
     $(`[data-act="${act}"]`, root).setAttribute('aria-pressed', String(value));
   }
 
+  function stepVis(step) {
+    visIndex = (visIndex + step + VISUALIZERS.length) % VISUALIZERS.length;
+    renderer = VISUALIZERS[visIndex].create();
+    storage.set(VIS_KEY, VISUALIZERS[visIndex].id);
+    flashBadge();
+  }
+
   const actions = {
     toggle: () => (player.playing ? actions.pause() : playIndex(index)),
     pause: async () => { await player.pause(); stopLoop(); sync(); },
@@ -422,18 +473,23 @@ export function mount() {
       else applyFx();
     },
     mini: () => toggleMini(),
+    full: async () => {
+      if (!fsSupported || win.classList.contains('mini')) return;
+      try {
+        if (fsElement()) await (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+        else await (stage.requestFullscreen || stage.webkitRequestFullscreen).call(stage);
+      } catch (e) { /* refused (no user gesture, or blocked by the browser): stay windowed */ }
+    },
+    'fx-prev': () => showFxPage(fxPage - 1),
+    'fx-next': () => showFxPage(fxPage + 1),
     'fx-reset': () => {
       Object.assign(fx, { eq: EQ_PRESETS.flat.slice(), preset: 'flat', reverb: 0, echo: 0, rate: 100, keep: false, cutoff: 100 });
       applyFx();
       paintFx();
       saveFx();
     },
-    vis: () => {
-      visIndex = (visIndex + 1) % VISUALIZERS.length;
-      renderer = VISUALIZERS[visIndex].create();
-      storage.set(VIS_KEY, VISUALIZERS[visIndex].id);
-      flashBadge();
-    },
+    vis: () => stepVis(1),
+    'vis-prev': () => stepVis(-1),
   };
 
   // ---------- Speed, EQ and effects ----------
@@ -454,11 +510,53 @@ export function mount() {
     player.setRate(fx.rate / 100, fx.keep);
   }
 
+  // Preset dropdown: the browser's own <select> menu can't look like Windows, so this is a button + list; the hidden <select> holds the value.
+  const combo = $('#mp-combo', root);
+  const comboBtn = $('.mp-combo-btn', combo);
+  const comboList = $('.mp-combo-list', combo);
+  const presetNames = [...preset.options].map((o) => o.value);
+  function syncPreset() {
+    $('#mp-combo-val', root).textContent = t(`mp-eq-${preset.value}`);
+    $$('li', comboList).forEach((li) => li.setAttribute('aria-selected', String(li.dataset.value === preset.value)));
+  }
+  function setComboOpen(open) {
+    comboList.hidden = !open;
+    comboBtn.setAttribute('aria-expanded', String(open));
+  }
+  function choosePreset(value) {
+    if (value === preset.value) return;
+    preset.value = value;
+    preset.dispatchEvent(new Event('change'));
+    syncPreset();
+  }
+  comboBtn.addEventListener('click', () => setComboOpen(comboList.hidden));
+  comboList.addEventListener('mousedown', (e) => e.preventDefault());          // keep focus on the button so the click lands before the list closes
+  comboList.addEventListener('click', (e) => {
+    const li = e.target.closest('li[data-value]');
+    if (!li) return;
+    choosePreset(li.dataset.value);
+    setComboOpen(false);
+    comboBtn.focus();
+  });
+  combo.addEventListener('focusout', (e) => { if (!combo.contains(e.relatedTarget)) setComboOpen(false); });
+  comboBtn.addEventListener('keydown', (e) => {
+    const step = { ArrowDown: 1, ArrowUp: -1 }[e.key];
+    if (step) {
+      e.preventDefault();
+      e.stopPropagation();                                                      // the player's own arrows (tracks, volume) stay out of it
+      choosePreset(presetNames[Math.min(presetNames.length - 1, Math.max(0, presetNames.indexOf(preset.value) + step))]);
+    } else if (e.key === 'Escape' && !comboList.hidden) {
+      e.stopPropagation();
+      setComboOpen(false);
+    }
+  });
+
   function paintFx() {
     speed.value = String(fx.rate);
     $('#mp-speed-out', root).textContent = (fx.rate / 100).toFixed(2) + '×';
     keep.checked = fx.keep;
     preset.value = fx.preset;
+    syncPreset();
     bands.forEach((band, i) => { band.value = String(fx.eq[i]); });
     reverb.value = String(fx.reverb);
     echo.value = String(fx.echo);
@@ -467,8 +565,19 @@ export function mount() {
 
   const saveFx = () => storage.setJSON(FX_KEY, fx);
 
+  // The enhancements panel shows one page at a time (speed, equalizer, effects), switched with the < > arrows.
+  const fxPages = $$('.mp-fs[data-page]', root);
+  let fxPage = 0;
+  function showFxPage(i) {
+    fxPage = (i + fxPages.length) % fxPages.length;
+    fxPages.forEach((page, n) => { page.hidden = n !== fxPage; });
+    $('#mp-fx-name', root).textContent = t(fxPages[fxPage].dataset.page);
+  }
+  showFxPage(0);
+
   function setFxOpen(open) {
     fxOpen = open;
+    if (open) { showFxPage(fxPage); syncPreset(); }                // refresh the page title (the language may have changed)
     mp.classList.toggle('fx-open', open);
     $('.mp-fx', root).hidden = !open;
     $('[data-act="fx"]', root).setAttribute('aria-pressed', String(open));
@@ -488,6 +597,7 @@ export function mount() {
     fx.eq[Number(band.dataset.band)] = Number(band.value);
     fx.preset = 'custom';
     preset.value = 'custom';
+    syncPreset();
     applyFx(); saveFx();
   }));
 
@@ -578,6 +688,7 @@ export function mount() {
     if (tab) { windows.open(tab.dataset.open); return; }
     if (e.target.closest('[data-action="burn"]')) openBurnWizard();
   });
+  $$('.mp-mini', root).forEach((btn) => btn.addEventListener('pointerenter', () => btn.removeAttribute('title')));   // the CSS tooltip replaces the native one
   const volume = $('.mp-vol', root);
   volume.addEventListener('input', (e) => player.setVolume(Number(e.target.value) / 100));
 
@@ -600,8 +711,75 @@ export function mount() {
   seekBar.addEventListener('pointerup', endSeek);
   seekBar.addEventListener('pointercancel', endSeek);
 
+  // ---------- Full screen: the visualizer fills the display; the controls fade after a moment without input ----------
+
+  const stage = $('.mp-stage', root);
+  const deck = $('.mp-deck', root);
+  const fsSupported = !!(stage.requestFullscreen || stage.webkitRequestFullscreen);
+  const fsElement = () => document.fullscreenElement || document.webkitFullscreenElement || null;
+  let idleTimer = 0;
+  function wake() {                                    // show the controls, then hide them again after IDLE_MS (unless the pointer is on them)
+    stage.classList.remove('idle');
+    clearTimeout(idleTimer);
+    if (fsElement() !== stage) return;
+    idleTimer = setTimeout(() => (deck.matches(':hover') ? wake() : stage.classList.add('idle')), IDLE_MS);
+  }
+  function onFullscreenChange() {
+    const on = fsElement() === stage;
+    stage.classList.toggle('full', on);
+    $$('.mp-mini[data-act="full"]', root).forEach((btn) => btn.setAttribute('aria-pressed', String(on)));
+    wake();
+  }
+  if (!fsSupported) $$('[data-act="full"]', root).forEach((btn) => { btn.hidden = true; });
+  document.addEventListener('fullscreenchange', onFullscreenChange);
+  document.addEventListener('webkitfullscreenchange', onFullscreenChange);
+  ['pointermove', 'pointerdown', 'keydown', 'touchstart'].forEach((type) => stage.addEventListener(type, wake, { passive: true }));
+  screen.addEventListener('dblclick', () => { if (!kaoss) actions.full(); });
+
+  // ---------- Drop audio files from the computer onto the window ----------
+
+  const isAudio = (file) => file.type.startsWith('audio/') || AUDIO_EXT.test(file.name);
+  /** Adds audio files to the playlist (object URLs: nothing is uploaded) and plays the first one added. */
+  function addLocalFiles(files) {
+    const audio = [...files].filter(isAudio);
+    if (!audio.length) { if (files.length) showBadge(t('mp-err-file'), ERROR_BADGE_MS); return; }
+    const first = tracks.length;
+    audio.forEach((file) => tracks.push({ name: file.name.replace(/\.[^.]+$/, ''), src: URL.createObjectURL(file), local: true }));
+    renderList();
+    playIndex(first);
+  }
+  const hasFiles = (e) => e.dataTransfer && [...e.dataTransfer.types].includes('Files');
+  let dropping = false;
+  const setDropping = (on) => {
+    if (on === dropping) return;
+    dropping = on;
+    mp.classList.toggle('dropping', on);
+    if (on) showBadge(t('mp-drop'), 60000);
+    else $('#mp-badge', root).classList.remove('show');
+  };
+  win.addEventListener('dragover', (e) => { if (!hasFiles(e)) return; e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; setDropping(true); });
+  win.addEventListener('dragleave', (e) => { if (!win.contains(e.relatedTarget)) setDropping(false); });
+  win.addEventListener('drop', (e) => {
+    if (!hasFiles(e)) return;
+    e.preventDefault();
+    setDropping(false);
+    addLocalFiles(e.dataTransfer.files);
+  });
+
+  if (session) {
+    const handlers = {
+      play: () => { if (!player.playing) playIndex(index); },
+      pause: () => { if (player.playing) actions.pause(); },
+      previoustrack: actions.prev,
+      nexttrack: actions.next,
+      stop: actions.stop,
+    };
+    Object.entries(handlers).forEach(([name, fn]) => { try { session.setActionHandler(name, fn); } catch (e) { /* this browser doesn't support that action */ } });
+  }
+
   // Keyboard, only while focus is inside the player: Space play/pause, arrows for tracks and volume.
   win.addEventListener('keydown', (e) => {
+    if (e.altKey && e.key === 'Enter' && !e.ctrlKey && !e.metaKey) { e.preventDefault(); actions.full(); return; }   // Alt+Enter: full screen, as in WMP
     if (e.altKey || e.ctrlKey || e.metaKey) return;
     if (e.target.closest('button') && (e.key === ' ' || e.key === 'Enter')) return;     // a focused button keeps its own activation
     if (e.target === volume && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) return; // the slider's own arrows
@@ -624,11 +802,7 @@ export function mount() {
 
   // A file the visitor picks plays straight from their computer (an object URL): nothing is uploaded or hosted.
   $('#mp-file', root).addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    tracks.push({ name: file.name.replace(/\.[^.]+$/, ''), src: URL.createObjectURL(file), local: true });
-    renderList();
-    playIndex(tracks.length - 1);
+    addLocalFiles(e.target.files);
     e.target.value = '';
   });
   availableFileTracks().then((found) => {          // files published in music/ appear in the playlist
@@ -643,7 +817,7 @@ export function mount() {
   player.setMaster(effective());
   bus.on('volume:changed', ({ effective: scale }) => player.setMaster(scale));   // the tray's volume drives the Web Audio master gain
   bus.on('lang:changed', sync);
-  bus.on('window:closed', ({ id }) => { if (id === 'music') { actions.stop(); exitMini(); } });
+  bus.on('window:closed', ({ id }) => { if (id === 'music') { actions.stop(); exitMini(); if (fsElement() === stage) actions.full(); } });
   bus.on('power:down', () => actions.stop());                                      // Log Off / Turn Off silence the player
 
   readPalette();
