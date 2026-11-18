@@ -45,7 +45,7 @@ function horseShape() {
 export class PieceFactory {
   #geometries = new Map();
   #materials = {
-    w: new THREE.MeshPhysicalMaterial({ color: 0xf3eee4, roughness: 0.1, clearcoat: 1, clearcoatRoughness: 0.03, sheen: 0.4, sheenColor: new THREE.Color(0xffffff) }),
+    w: new THREE.MeshPhysicalMaterial({ color: 0xf3eee4, roughness: 0.1, clearcoat: 1, clearcoatRoughness: 0.03 }),
     b: new THREE.MeshPhysicalMaterial({ color: 0x2b2523, roughness: 0.1, clearcoat: 1, clearcoatRoughness: 0.03, envMapIntensity: 1.5 }),
   };
   /** Contrasting detail: dark on the white pieces, light on the black ones. */
@@ -128,6 +128,20 @@ export class PieceFactory {
         this.#mesh(geo('k-band', () => new THREE.TorusGeometry(0.235, 0.025, 10, 40).rotateX(Math.PI / 2)), color, [0, 1.2, 0], true));
     }
     return group;
+  }
+
+  /**
+   * Fallback for GPUs/drivers (some Macs) where the physical material's shader fails to compile and
+   * the pieces silently disappear: swaps the two shared piece materials for plain standard ones.
+   */
+  useSimpleMaterials() {
+    const simple = {
+      w: new THREE.MeshStandardMaterial({ color: 0xf3eee4, roughness: 0.25, metalness: 0.05 }),
+      b: new THREE.MeshStandardMaterial({ color: 0x2b2523, roughness: 0.25, metalness: 0.1 }),
+    };
+    const old = this.#materials;
+    this.#materials = simple;
+    return { old, simple };
   }
 
   dispose() {

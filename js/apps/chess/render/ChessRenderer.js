@@ -74,6 +74,13 @@ export class ChessRenderer {
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.05;
+    let downgraded = false;
+    renderer.debug.onShaderError = () => {                   // the glossy piece shader failed (seen on some Macs)
+      if (downgraded || this.#disposed) return;
+      downgraded = true;
+      console.warn('Piece shader failed to compile; using simple materials.');
+      this.pieces.useSimpleMaterials();
+    };
 
     this.#envTarget = makeEnvironment(renderer);
     this.scene.environment = this.#envTarget.texture;

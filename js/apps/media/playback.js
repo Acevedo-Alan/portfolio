@@ -33,6 +33,16 @@ export class Playback {
   seek(fraction) { if (this.seekable) this.#files.seek(fraction); }
 
   setVolume(volume) { this.#out.setVolume(volume); }
+
+  /** The signal chain (EQ, filter, reverb, echo): see output.js. */
+  get fx() { return this.#out; }
+
+  /** Speed multiplier for both engines; `keepPitch` changes the tempo without changing the key. */
+  setRate(rate, keepPitch = false) {
+    this.#synth.setRate(rate, keepPitch);
+    this.#files.setRate(rate, keepPitch);
+  }
+
   setMaster(scale) { this.#out.setMaster(scale); }
 
   async play(track) {

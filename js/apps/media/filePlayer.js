@@ -11,6 +11,8 @@ export class FilePlayer {
   #audio = null;
   #source = null;
   #track = null;
+  #rate = 1;
+  #keepPitch = false;
 
   /** Called when a track plays to its end. */
   onEnded = () => {};
@@ -32,6 +34,20 @@ export class FilePlayer {
   /** True once the file's length is known, i.e. jumping to a position makes sense. */
   get seekable() {
     return !!this.#audio && Number.isFinite(this.#audio.duration) && this.#audio.duration > 0;
+  }
+
+  /** Playback speed; with keepPitch false the pitch follows the speed, like a record. */
+  setRate(rate, keepPitch) {
+    this.#rate = rate;
+    this.#keepPitch = keepPitch;
+    if (this.#audio) this.#applyRate(this.#audio);
+  }
+
+  #applyRate(audio) {
+    audio.playbackRate = this.#rate;
+    audio.preservesPitch = this.#keepPitch;
+    audio.mozPreservesPitch = this.#keepPitch;
+    audio.webkitPreservesPitch = this.#keepPitch;
   }
 
   /** Jumps to `fraction` (0..1) of the track. */
@@ -64,6 +80,7 @@ export class FilePlayer {
     const audio = new Audio();
     audio.preload = 'auto';
     audio.src = track.src;
+    this.#applyRate(audio);
     this.#source = this.#out.ctx.createMediaElementSource(audio);
     this.#source.connect(this.#out.master);
     audio.addEventListener('ended', () => this.onEnded());

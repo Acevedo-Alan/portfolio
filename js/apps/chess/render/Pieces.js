@@ -113,6 +113,17 @@ export class Pieces {
     }
   }
 
+  /** Re-skins every piece with simple materials (used when the glossy shader can't compile). */
+  useSimpleMaterials() {
+    const { old, simple } = this.#factory.useSimpleMaterials();
+    this.group.traverse((o) => {
+      if (!o.isMesh) return;
+      if (o.material === old.w) o.material = simple.w;
+      else if (o.material === old.b) o.material = simple.b;
+    });
+    Object.values(old).forEach((m) => m.dispose());
+  }
+
   dispose() {
     this.#anims = [];
     this.#easing.clear();

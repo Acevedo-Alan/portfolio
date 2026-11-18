@@ -25,10 +25,15 @@ export class Chiptune {
   #step = 0;
   #nextTime = 0;
   #startedAt = 0;
+  #rate = 1;                // playback speed; pitch follows it unless `#keepPitch`
+  #keepPitch = false;
 
   constructor(output) {
     this.#out = output;
   }
+
+  /** Speed multiplier (0.5..2). The synth is generated, so tempo and pitch are independent: pitch follows speed unless keepPitch. */
+  setRate(rate, keepPitch) { this.#rate = rate; this.#keepPitch = keepPitch; }
 
   get playing() { return this.#timer !== null; }
   get track() { return this.#track; }
@@ -87,7 +92,7 @@ export class Chiptune {
   // ---------- Scheduling ----------
 
   #tick() {
-    const stepSeconds = 60 / this.#track.bpm / 4;        // one sixteenth note
+    const stepSeconds = 60 / this.#track.bpm / 4 / this.#rate;        // one sixteenth note
     while (this.#nextTime < this.#ctx.currentTime + LOOKAHEAD_S) {
       this.#scheduleStep(this.#step, this.#nextTime, stepSeconds);
       this.#nextTime += stepSeconds;
@@ -109,7 +114,7 @@ export class Chiptune {
     const osc = this.#ctx.createOscillator();
     const gain = this.#ctx.createGain();
     osc.type = wave;
-    osc.frequency.value = midiToHz(midi);
+    osc.frequency.value = midiToHz(midi) * (this.#keepPitch ? 1 : this.#rate);
     gain.gain.setValueAtTime(0.0001, time);
     gain.gain.linearRampToValueAtTime(volume, time + 0.005);
     gain.gain.exponentialRampToValueAtTime(0.0001, time + duration);

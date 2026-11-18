@@ -173,3 +173,49 @@
 }
 .mp-open:hover { background: rgba(255, 255, 255, .26); }
 .mp-open:focus-visible { outline: 2px dotted #fff; outline-offset: 1px; }
+
+/* ---------- Beat pulse: the screen glows and the orb swells on every detected beat (--mp-beat, 0..1) ---------- */
+.mp-screen { box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .25), 0 2px 8px rgba(0, 0, 0, .45), 0 0 calc(var(--mp-beat, 0) * 28px) calc(var(--mp-beat, 0) * 5px) var(--mp-glow); }
+.mp-play { transform: scale(calc(1 + var(--mp-beat, 0) * .07)); }
+.mp-screen.kaoss { cursor: cell; outline: 1px dashed rgba(255, 255, 255, .55); outline-offset: -6px; }
+
+/* ----- Sidebar tools: five round buttons wrap to two rows ----- */
+.mp-side-tools { flex-wrap: wrap; max-width: 128px; }
+.mp-mini[aria-pressed="true"] { background: linear-gradient(#8FC0FF, #3A78E0); border-color: #fff; }
+
+/* ----- Speed / EQ / effects panel (replaces the playlist while open) ----- */
+.mp-fx { flex: 0 1 auto; min-height: 0; margin: 6px 18px 34px 6px; padding: 2px 8px 8px; overflow: auto; border: 1px solid rgba(255, 255, 255, .4); border-radius: 3px; background: rgba(4, 18, 70, .42); font-size: 12px; }
+.mp-fx[hidden] { display: none; }
+.mp-fs { margin: 6px 0 0; padding: 4px 8px 8px; min-width: 0; border: 1px solid rgba(255, 255, 255, .28); border-radius: 3px; }
+.mp-fs legend { padding: 0 4px; color: #D6E4FF; font-size: 11px; }
+.mp-row { display: grid; grid-template-columns: 82px minmax(0, 1fr) auto; gap: 8px; align-items: center; margin: 3px 0; }
+.mp-check { display: flex; align-items: center; gap: 6px; margin-top: 4px; }
+.mp-fx input[type="range"] { width: 100%; accent-color: #7DB6FF; cursor: var(--hand); }
+.mp-select { margin-bottom: 6px; padding: 2px 4px; color: #000; font: 12px Tahoma, "Segoe UI", sans-serif; background: #fff; border: 1px solid #7F9DB9; }
+.mp-eq { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 2px; text-align: center; }
+.mp-eq label { display: grid; justify-items: center; gap: 2px; }
+/* writing-mode makes the slider vertical in current browsers; the old non-standard slider-vertical appearance is gone, and stacking both breaks dragging. */
+.mp-eq input { writing-mode: vertical-lr; direction: rtl; width: 18px; height: 84px; margin: 0; touch-action: none; }
+.mp-fx, .mp-screen, .mp-seek { user-select: none; -webkit-user-select: none; -webkit-user-drag: none; }
+.mp-canvas { -webkit-user-drag: none; -webkit-touch-callout: none; }
+.mp-eq span { font-size: 10px; color: #C2D6FF; }
+.mp-reset { margin-top: 6px; }
+.mp-fx select:focus-visible, .mp-fx input:focus-visible, .mp-fx button:focus-visible { outline: 2px dotted #fff; outline-offset: 1px; }
+.mp-fx:not([hidden]) ~ .mp-tracks { display: none; }
+
+/* ----- Playlist reordering ----- */
+.mp-list li[draggable="true"] { cursor: grab; }
+.mp-list li.dragging { opacity: .45; }
+.mp-list li.drop-before { box-shadow: 0 -2px 0 #9CCBFF; }
+.mp-list li.drop-after { box-shadow: 0 2px 0 #9CCBFF; }
+
+/* ----- Mini player: only the screen, title and transport are kept ----- */
+.window.mini .mp { grid-template-columns: minmax(0, 1fr); }
+.window.mini .mp-side, .window.mini .mp-tracks, .window.mini .mp-fx, .window.mini .mp-tracks-foot,
+.window.mini .mp-toggle, .window.mini .mp-vol-wrap { display: none; }
+.window.mini .mp-stage { padding-left: 14px; }
+.window.mini .mp-screen { margin-right: 14px; min-height: 90px; }
+.window.mini .mp-title { font-size: 14px; }
+.window.mini .mp-ctrls { gap: 8px; }
+
+@media (prefers-reduced-motion: reduce) { .mp-play { transform: none; } }
