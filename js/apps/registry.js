@@ -33,7 +33,7 @@ export const APPS = [
   { id: 'music',       icon: 'windows-media-player-10',   title: 'box-music',       w: 780, h: 580, chrome: 'skin', noAddr: true, aliases: ['player', 'winamp'], group: 'extras' },
   { id: 'papelera',    icon: 'recycle-bin-full',     title: 'box-papelera',    w: 660, h: 380, group: 'tools' },
   { id: 'readme',      icon: 'notepad',    title: 'box-readme',      w: 520, h: 440, noAddr: true, aliases: ['notepad', 'txt'], group: 'tools' },
-  { id: 'solitaire',   icon: 'solitaire',  title: 'box-solitaire',   w: 640, h: 560, chrome: 'fixed', noAddr: true, aliases: ['cards'], group: 'extras' },
+  { id: 'solitaire',   icon: 'solitaire',  title: 'box-solitaire',   w: 740, h: 650, chrome: 'fixed', noAddr: true, aliases: ['cards'], group: 'extras' },
   { id: 'doom',        icon: 'doom', title: 'box-doom',        w: 660, h: 500, noAddr: true, aliases: ['dos'], group: 'extras' },
   { id: 'chess',       icon: 'chess', title: 'box-chess',       w: 720, h: 640, noAddr: true, aliases: ['ajedrez', 'titans'], group: 'extras' },
   { id: 'display',    icon: 'display-properties', title: 'box-display',     w: 420, h: 540, chrome: 'dialog', noAddr: true, desktop: false, aliases: ['properties'], group: 'tools' },

@@ -1,25 +1,34 @@
 /*
- * apps/solitaire/engine.js — Klondike rules, no DOM. State is plain data so it can be
- * tested in Node (tests/solitaire.test.mjs).
+ * apps/solitaire/engine.js — Spider Solitaire rules (Windows XP's), no DOM. State is plain data so it
+ * can be tested in Node (tests/solitaire.test.mjs).
  *
- *   state = { stock, waste, foundations: [4 piles], tableau: [7 piles], moves, score, draw }
- *   draw  = how many stock cards a draw turns over (1 or 3)
- *   score = Windows-style scoring: waste→tableau +5, →foundation +10, foundation→tableau −15,
- *           a revealed tableau card +5, recycling the waste with draw 1 −100 (never below 0)
+ *   state = { tableau: [10 piles], stock: [deals of 10 cards], completed: [suits], suits, moves, score }
  *   card  = { suit: 'S'|'H'|'D'|'C', rank: 1..13, up: boolean }
  *
- * A "place" names where cards come from or go to:
- *   { zone: 'waste' }                          the top waste card
- *   { zone: 'foundation', index: 0..3 }        the top card of that foundation
- *   { zone: 'tableau', index: 0..6, count? }   the top `count` (default 1) cards of that pile
- * Every move function returns true when it changed the state, false when the move is illegal.
+ * Difficulty is the number of suits (1, 2 or 4); the 104 cards are 8 sets of 13 spread over them.
+ * Rules:
+ *   - a card (or block) can be dropped on a card exactly one rank higher, of any suit;
+ *   - only a descending run of ONE suit can be picked up together;
+ *   - an empty column takes any card or valid run;
+ *   - dealing puts one face-up card on every column and is refused while a column is empty;
+ *   - 13 cards K..A of one suit in a row leave the table (+100) and the card under them turns over;
+ *   - score starts at 500, every move costs 1 (Undo too).
+ * `move` and `deal10` return { ok: true, ... } or { ok: false, reason }.
  */
 
 export const SUITS = ['S', 'H', 'D', 'C'];
+export const START_SCORE = 500;
+export const COLUMNS = 10;
 export const isRed = (card) => card.suit === 'H' || card.suit === 'D';
 
-export function newDeck() {
-  return SUITS.flatMap((suit) => Array.from({ length: 13 }, (_, i) => ({ suit, rank: i + 1, up: false })));
+/** The suit of each of the 8 sets for a difficulty (1, 2 or 4 suits). */
+export function suitSets(suits) {
+  const per = 8 / suits;
+  return Array.from({ length: 8 }, (_, i) => SUITS[Math.floor(i / per)]);
+}
+
+export function newDeck(suits = 1) {
+  return suitSets(suits).flatMap((suit) => Array.from({ length: 13 }, (_, i) => ({ suit, rank: i + 1, up: false })));
 }
 
 /** Fisher–Yates; `random` is injectable for tests. */
@@ -32,109 +41,107 @@ export function shuffle(cards, random = Math.random) {
   return deck;
 }
 
-export function deal(random = Math.random, draw = 1) {
-  const deck = shuffle(newDeck(), random);
-  const tableau = Array.from({ length: 7 }, (_, col) => {
-    const pile = deck.splice(0, col + 1);
-    pile[pile.length - 1].up = true;
-    return pile;
-  });
-  return { stock: deck, waste: [], foundations: [[], [], [], []], tableau, moves: 0, score: 0, draw };
+/** 10 columns (four of 6 cards, six of 5; only the last face up) and 5 stock deals of 10. */
+export function deal(random = Math.random, suits = 1) {
+  const deck = shuffle(newDeck(suits), random);
+  const tableau = Array.from({ length: COLUMNS }, (_, col) => deck.splice(0, col < 4 ? 6 : 5));
+  tableau.forEach((pile) => { pile[pile.length - 1].up = true; });
+  const stock = Array.from({ length: 5 }, () => deck.splice(0, COLUMNS));
+  return { tableau, stock, completed: [], suits, moves: 0, score: START_SCORE };
 }
 
-const top = (pile) => pile[pile.length - 1];
-const addScore = (state, points) => { state.score = Math.max(0, state.score + points); };
+export const isWon = (state) => state.completed.length === 8;
 
-// ---------- Rules ----------
-
-export const canGoToFoundation = (card, pile) => (pile.length === 0
-  ? card.rank === 1
-  : top(pile).suit === card.suit && card.rank === top(pile).rank + 1);
-
-export const canGoToTableau = (card, pile) => (pile.length === 0
-  ? card.rank === 13
-  : isRed(top(pile)) !== isRed(card) && card.rank === top(pile).rank - 1);
-
-export const isWon = (state) => state.foundations.every((pile) => pile.length === 13);
-
-// ---------- Reading a place ----------
-
-/** The cards a `from` place would pick up (a view into the state, not a copy). */
-function picked(state, from) {
-  if (from.zone === 'waste') return state.waste.length ? [top(state.waste)] : [];
-  if (from.zone === 'foundation') { const pile = state.foundations[from.index]; return pile.length ? [top(pile)] : []; }
-  const pile = state.tableau[from.index];
-  const count = from.count || 1;
-  const cards = pile.slice(pile.length - count);
-  return cards.length === count && cards.every((c) => c.up) && runIsValid(cards) ? cards : [];
+/** True when cards from `position` to the end of the column form a pick-up-able run. */
+export function isRun(pile, position) {
+  const cards = pile.slice(position);
+  return cards.length > 0 && cards.every((c, i) => c.up && (i === 0 || (c.suit === cards[i - 1].suit && c.rank === cards[i - 1].rank - 1)));
 }
 
-/** A tableau run moves together only if it descends in rank, alternating colors. */
-const runIsValid = (cards) => cards.every((c, i) => i === 0 || (isRed(c) !== isRed(cards[i - 1]) && c.rank === cards[i - 1].rank - 1));
-
-function take(state, from, count) {
-  if (from.zone === 'waste') return state.waste.splice(-1, 1);
-  if (from.zone === 'foundation') return state.foundations[from.index].splice(-1, 1);
-  const pile = state.tableau[from.index];
-  const taken = pile.splice(pile.length - count, count);
-  if (pile.length && !top(pile).up) { top(pile).up = true; addScore(state, 5); }   // reveal the card that was underneath
-  return taken;
+/** Can the run starting at `from.position` of column `from.col` be dropped on column `to`? */
+export function canDrop(state, from, to) {
+  if (from.col === to) return false;
+  const source = state.tableau[from.col];
+  if (!isRun(source, from.position)) return false;
+  const target = state.tableau[to];
+  if (!target.length) return true;
+  const top = target[target.length - 1];
+  return top.up && top.rank === source[from.position].rank + 1;
 }
 
-// ---------- Moves ----------
-
-/** Turns a stock card onto the waste; with an empty stock, recycles the waste (face down). */
-export function drawFromStock(state) {
-  if (state.stock.length) {
-    const count = Math.min(state.draw || 1, state.stock.length);
-    for (let i = 0; i < count; i++) {
-      const card = state.stock.pop();
-      card.up = true;
-      state.waste.push(card);
+/** Turns over the card exposed at the end of a column, and removes a finished K..A run. Returns the run's suit, or null. */
+function settle(state, col) {
+  const pile = state.tableau[col];
+  let removed = null;
+  if (pile.length >= 13) {
+    const tail = pile.slice(-13);
+    if (tail[0].rank === 13 && isRun(tail, 0)) {
+      pile.splice(-13);
+      state.completed.push(tail[0].suit);
+      state.score += 100;
+      removed = tail[0].suit;
     }
-  } else if (state.waste.length) {
-    state.stock = state.waste.reverse().map((card) => ({ ...card, up: false }));
-    state.waste = [];
-    if ((state.draw || 1) === 1) addScore(state, -100);
-  } else {
-    return false;
   }
-  state.moves++;
-  return true;
+  if (pile.length && !pile[pile.length - 1].up) pile[pile.length - 1].up = true;
+  return removed;
 }
 
 export function move(state, from, to) {
-  const cards = picked(state, from);
-  if (!cards.length) return false;
-  const count = cards.length;
-  let points = 0;
-  if (to.zone === 'foundation') {
-    if (count !== 1 || !canGoToFoundation(cards[0], state.foundations[to.index])) return false;
-    if (from.zone === 'foundation' && from.index === to.index) return false;
-    if (from.zone !== 'foundation') points = 10;
-    state.foundations[to.index].push(...take(state, from, 1));
-  } else if (to.zone === 'tableau') {
-    if (from.zone === 'tableau' && from.index === to.index) return false;
-    if (!canGoToTableau(cards[0], state.tableau[to.index])) return false;
-    if (from.zone === 'waste') points = 5;
-    if (from.zone === 'foundation') points = -15;
-    state.tableau[to.index].push(...take(state, from, count));
-  } else {
-    return false;
-  }
-  addScore(state, points);
+  if (!canDrop(state, from, to)) return { ok: false, reason: 'illegal' };
+  const cards = state.tableau[from.col].splice(from.position);
+  state.tableau[to].push(...cards);
   state.moves++;
-  return true;
+  state.score -= 1;
+  const runs = [];
+  settle(state, from.col);
+  const suit = settle(state, to);
+  if (suit) runs.push({ col: to, suit });
+  return { ok: true, completed: runs.length > 0, runs };
 }
 
-/** Double-click: the foundation that would take this card, or -1. */
-export function foundationFor(state, from) {
-  const cards = picked(state, from);
-  if (cards.length !== 1) return -1;
-  return state.foundations.findIndex((pile) => canGoToFoundation(cards[0], pile));
+/** Deals one face-up card to each column from the stock. */
+export function deal10(state) {
+  if (!state.stock.length) return { ok: false, reason: 'no-stock' };
+  if (state.tableau.some((pile) => !pile.length)) return { ok: false, reason: 'empty-column' };
+  const row = state.stock.pop();
+  row.forEach((card, col) => { state.tableau[col].push({ ...card, up: true }); });
+  const runs = [];
+  state.tableau.forEach((_, col) => { const suit = settle(state, col); if (suit) runs.push({ col, suit }); });
+  return { ok: true, completed: runs.length > 0, runs };
 }
 
-export function autoToFoundation(state, from) {
-  const index = foundationFor(state, from);
-  return index >= 0 && move(state, from, { zone: 'foundation', index });
+/** Undo's price: one point (the caller restores the snapshot first). */
+export function chargeUndo(state) {
+  state.score -= 1;
 }
+
+/**
+ * Every legal move, best first, in three tiers: (1) stacking on a card of the same suit (building a run),
+ * (2) uncovering a face-down card, (3) anything else, with moves into an empty column last. Moving a whole
+ * column onto an empty one is never suggested (it only swaps columns, and would loop forever).
+ */
+export function hints(state) {
+  const found = [];
+  state.tableau.forEach((pile, col) => {
+    for (let position = 0; position < pile.length; position++) {
+      if (!isRun(pile, position)) continue;
+      state.tableau.forEach((target, to) => {
+        if (!canDrop(state, { col, position }, to)) return;
+        const top = target[target.length - 1];
+        const card = pile[position];
+        if (!top && position === 0) return;
+        const uncovers = position > 0 && !pile[position - 1].up;
+        let tier = 1;
+        if (top && top.suit === card.suit) tier = 3;
+        else if (uncovers) tier = 2;
+        else if (!top) tier = 0;
+        // within a tier: uncovering, then emptying a column, then longer blocks
+        const value = tier * 100 + (uncovers ? 20 : 0) + (position === 0 ? 10 : 0) + Math.min(pile.length - position, 9);
+        found.push({ from: { col, position }, to, value });
+      });
+    }
+  });
+  return found.sort((a, b) => b.value - a.value);
+}
+
+export const canDeal = (state) => state.stock.length > 0 && state.tableau.every((pile) => pile.length > 0);
