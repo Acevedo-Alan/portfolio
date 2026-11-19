@@ -24,24 +24,24 @@
 <link rel="icon" href="imgs/favicon.ico" type="image/x-icon">
 
 
-<!-- Open Graph / Twitter Card: title and description are reused verbatim
-     from <title> and the meta description above so the three stay in
-     sync. og:url and the image URLs need an absolute production URL,
-     which doesn't exist yet — replace REPLACE_WITH_PRODUCTION_DOMAIN
-     below once the site is deployed; shipping a guessed domain would be
-     worse than an obvious placeholder. -->
+<!-- Open Graph / Twitter Card: title and description are reused verbatim from <title> and the meta
+     description above so the three stay in sync. og-image.png is 1200x630 (LinkedIn, WhatsApp and Discord
+     don't render SVG). -->
 <meta property="og:type" content="website" />
 <meta property="og:title" content="Alan Acevedo — Full Stack Developer" />
 <meta property="og:description" content="Full Stack Developer building web and mobile applications with Java, Spring Boot, React and TypeScript." />
-<meta property="og:image" content="https://REPLACE_WITH_PRODUCTION_DOMAIN/og-image.svg" />
-<meta property="og:url" content="https://REPLACE_WITH_PRODUCTION_DOMAIN/" />
+<meta property="og:image" content="https://alan-acevedo.vercel.app/og-image.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="Escritorio estilo Windows XP del portfolio de Alan Acevedo" />
+<meta property="og:url" content="https://alan-acevedo.vercel.app/" />
 <meta property="og:locale" content="es_AR" />
 <meta property="og:locale:alternate" content="en_US" />
 
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Alan Acevedo — Full Stack Developer" />
 <meta name="twitter:description" content="Full Stack Developer building web and mobile applications with Java, Spring Boot, React and TypeScript." />
-<meta name="twitter:image" content="https://REPLACE_WITH_PRODUCTION_DOMAIN/og-image.svg" />
+<meta name="twitter:image" content="https://alan-acevedo.vercel.app/og-image.png" />
 
 <!-- Styles: one partial per concern (see the map at the top of css/base.css) -->
 <link rel="stylesheet" href="css/base.css">
@@ -263,6 +263,7 @@
             <legend data-i18n="sp-desc"></legend>
             <p class="hero-bio" data-i18n="bio"></p>
           </fieldset>
+          <p class="cv-row"><a class="btn-xp cv-btn" href="resume/Alan-Acevedo-CV.pdf" download data-i18n-label="cv-download"><img src="imgs/xp-icons/generic-document.png" alt="" aria-hidden="true" draggable="false"><span data-i18n="cv-download"></span></a></p>
         </div>
 
         <div role="tabpanel" id="panel-tools" class="tab-panel" aria-labelledby="tab-tools" hidden>
