@@ -191,16 +191,46 @@
 
 <!-- Wallpaper: Bliss-like sky and hill -->
 <div class="wallpaper" aria-hidden="true">
-  <div class="cloud cloud-a"></div>
-  <div class="cloud cloud-b"></div>
+  <!-- Clouds: overlapping soft ellipses, blurred and warped by turbulence so the edges are wispy, with a bluish underside -->
+  <svg class="cloud cloud-a" viewBox="0 0 360 120" focusable="false">
+    <defs>
+      <filter id="f-cloud-a" x="-20%" y="-40%" width="140%" height="180%">
+        <feTurbulence type="fractalNoise" baseFrequency=".014 .03" numOctaves="3" seed="7" result="n"/>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="26" result="d"/>
+        <feGaussianBlur in="d" stdDeviation="3.2"/>
+      </filter>
+      <linearGradient id="g-cloud" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset=".6" stop-color="#fff"/><stop offset="1" stop-color="#C9DDF5"/></linearGradient>
+    </defs>
+    <g filter="url(#f-cloud-a)" fill="url(#g-cloud)">
+      <ellipse cx="110" cy="76" rx="84" ry="22"/><ellipse cx="190" cy="62" rx="70" ry="28"/>
+      <ellipse cx="250" cy="78" rx="68" ry="20"/><ellipse cx="150" cy="50" rx="44" ry="20"/>
+    </g>
+  </svg>
+  <svg class="cloud cloud-b" viewBox="0 0 360 120" focusable="false">
+    <defs>
+      <filter id="f-cloud-b" x="-20%" y="-40%" width="140%" height="180%">
+        <feTurbulence type="fractalNoise" baseFrequency=".02 .035" numOctaves="3" seed="19" result="n"/>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="22" result="d"/>
+        <feGaussianBlur in="d" stdDeviation="2.6"/>
+      </filter>
+    </defs>
+    <g filter="url(#f-cloud-b)" fill="url(#g-cloud)">
+      <ellipse cx="120" cy="72" rx="90" ry="18"/><ellipse cx="205" cy="58" rx="58" ry="24"/><ellipse cx="260" cy="76" rx="56" ry="16"/>
+    </g>
+  </svg>
   <svg class="hill" viewBox="0 0 1600 500" preserveAspectRatio="none" focusable="false">
     <defs>
       <linearGradient id="g-hill-a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--hill-a1)"/><stop offset="1" style="stop-color:var(--hill-a2)"/></linearGradient>
       <linearGradient id="g-hill-b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--hill-b1)"/><stop offset="1" style="stop-color:var(--hill-b2)"/></linearGradient>
+      <radialGradient id="g-sun" cx=".3" cy="0" r=".8"><stop offset="0" stop-color="#fff" stop-opacity=".38"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+      <linearGradient id="g-shade" x1="0" y1="0" x2="0" y2="1"><stop offset=".5" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#0A2A06" stop-opacity=".35"/></linearGradient>
     </defs>
     <path d="M0 260C300 120 700 130 1000 210S1450 230 1600 150V500H0z" fill="url(#g-hill-b)"/>
     <path d="M0 360C250 250 600 250 900 320S1400 380 1600 300V500H0z" fill="url(#g-hill-a)"/>
+    <path d="M0 360C250 250 600 250 900 320S1400 380 1600 300V500H0z" fill="url(#g-sun)"/>
+    <path d="M0 360C250 250 600 250 900 320S1400 380 1600 300V500H0z" fill="url(#g-shade)"/>
   </svg>
+  <div class="hill-grain"></div>
 </div>
 
 <main id="desktop" tabindex="-1">

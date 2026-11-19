@@ -39,6 +39,19 @@ const GRID_KEY = 'portfolio-icons-grid';       // '0' = Align to Grid off (defau
 const ORDER_KEY = 'portfolio-icons-order';     // the line-up while Auto Arrange is on
 const BIN_ID = 'papelera';
 
+// Default layout for icons without a saved cell: column 0 is the portfolio, column 1 the apps and
+// games, and the Recycle Bin sits in the bottom-right corner like the classic desktop.
+const DEFAULT_COLUMNS = [
+  ['whoami', 'experiencia', 'proyectos', 'stack', 'educacion', 'contacto', 'readme'],
+  ['music', 'terminal', 'bugsweeper', 'solitaire', 'chess', 'doom'],
+];
+
+function defaultCell(id, g) {
+  if (id === BIN_ID) return { col: g.cols - 1, row: g.rows - 1 };
+  const col = DEFAULT_COLUMNS.findIndex((ids) => ids.includes(id));
+  return col < 0 ? null : { col, row: DEFAULT_COLUMNS[col].indexOf(id) };
+}
+
 let apps = [];
 let container = null;
 const buttons = new Map();       // id -> <button>
@@ -290,7 +303,10 @@ function layout() {
     btn.style.top = spot.y + 'px';
   });
   apps.filter((a) => saved[a.id] && !('x' in saved[a.id])).forEach((a) => cells.set(a.id, nearestFree(saved[a.id], g, a.id)));
-  apps.filter((a) => !saved[a.id]).forEach((a) => cells.set(a.id, firstFree(g)));
+  apps.filter((a) => !saved[a.id]).forEach((a) => {
+    const wanted = defaultCell(a.id, g);
+    cells.set(a.id, wanted ? nearestFree(wanted, g, a.id) : firstFree(g));
+  });
   cells.forEach((cell, id) => place(buttons.get(id), cell));
 }
 
