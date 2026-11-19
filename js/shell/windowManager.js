@@ -86,6 +86,11 @@ export function minimize(id) {
   activateTopmost();
 }
 
+/** "Show desktop": minimizes every open window. */
+export function minimizeAll() {
+  [...wins.keys()].forEach((id) => minimize(id));
+}
+
 export function close(id) {
   const w = wins.get(id);
   if (!w || w.status === 'closed') return;

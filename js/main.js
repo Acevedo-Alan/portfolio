@@ -30,6 +30,7 @@ import * as bsod from './shell/bsod.js';
 import * as balloon from './shell/balloon.js';
 import * as mascot from './shell/mascot.js';
 import * as mascotTips from './shell/mascotTips.js';
+import * as quickLaunch from './shell/quickLaunch.js';
 import * as keyboard from './shell/keyboard.js';
 
 import { mount as mountSysProps } from './apps/sysProps.js';
@@ -84,6 +85,7 @@ windows.init(APPS);
 desktopIcons.init(APPS);
 startMenu.init(APPS);
 taskbar.init();
+quickLaunch.init();
 tray.init();
 power.init();
 contextMenu.init();

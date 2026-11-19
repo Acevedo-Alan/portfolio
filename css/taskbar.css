@@ -17,6 +17,17 @@
 .start-btn[aria-expanded="true"] { filter: brightness(.9); }
 .start-btn:focus-visible { outline-color: #fff; outline-offset: -4px; }
 
+/* Quick Launch: 16px shortcuts right of Start, framed by dotted grips like the XP toolbar */
+.quick-launch { flex: none; display: flex; align-items: center; gap: 2px; padding: 0 6px 0 8px; margin-left: 2px;
+  border-left: 1px dotted rgba(255, 255, 255, .55); border-right: 1px dotted rgba(255, 255, 255, .55); }
+.ql-btn { width: 24px; height: 24px; display: grid; place-items: center; padding: 0; cursor: var(--hand);
+  background: none; border: 1px solid transparent; border-radius: 3px; }
+.ql-btn { text-decoration: none; }
+.ql-btn img, .ql-btn svg { width: 16px; height: 16px; }
+.ql-btn:hover { background: rgba(255, 255, 255, .22); border-color: rgba(255, 255, 255, .5); }
+.ql-btn:active { background: rgba(0, 0, 0, .2); }
+.ql-btn:focus-visible { outline-color: #fff; }
+
 .tasks { flex: 1; min-width: 0; display: flex; align-items: center; gap: 3px; padding: 3px 0; overflow: hidden; }
 .task {
   flex: 0 1 170px; min-width: 40px; height: 100%; display: flex; align-items: center; gap: 6px;
@@ -26,7 +37,7 @@
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, .35);
 }
 .task svg, .task img { width: 16px; height: 16px; flex: none; }
-.task span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.task span { padding: 2px 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .task span::first-letter { text-transform: uppercase; }
 .task:hover { filter: brightness(1.1); }
 .task.active { background: linear-gradient(#1E4FB8, #1A47A5); box-shadow: inset 1px 1px 3px rgba(0, 0, 0, .45); font-weight: 700; }
