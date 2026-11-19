@@ -5,7 +5,7 @@
  * Other modules can close it by emitting "startmenu:close".
  */
 
-import { $, icon } from '../core/dom.js';
+import { $, $$, icon } from '../core/dom.js';
 import * as bus from '../core/bus.js';
 import * as windows from './windowManager.js';
 import { play } from '../audio/sounds.js';
@@ -41,7 +41,11 @@ export function init(apps) {
     list.replaceChildren();
     if (showAll) apps.forEach((app) => list.appendChild(entry(app)));
     else {
-      byId(PINNED).forEach((app) => list.appendChild(entry(app)));
+      byId(PINNED).forEach((app) => {
+        const item = entry(app);
+        item.classList.add('pinned');                          // bold, like XP's pinned programs
+        list.appendChild(item);
+      });
       list.appendChild(separator());
       byId(RECENT).forEach((app) => list.appendChild(entry(app)));
     }
@@ -60,6 +64,7 @@ export function init(apps) {
     bus.emit('display:tab', 'account');
   });
   menu().addEventListener('click', (e) => { if (e.target.closest('a')) close(); });
+  $$('.sm-util button', menu()).forEach((btn) => btn.addEventListener('click', () => { close(); windows.open(btn.dataset.open); }));
 
   document.addEventListener('pointerdown', (e) => {
     if (!menu().hidden && !e.target.closest('#start-menu') && !e.target.closest('#start-btn')) close();

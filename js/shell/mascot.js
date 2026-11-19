@@ -89,7 +89,7 @@ function dismiss() {
 }
 
 function syncMenuLabel() {
-  $('#mascot-toggle').setAttribute('data-i18n', on ? 'mascot-hide-menu' : 'mascot-show');
+  $('#mascot-toggle-label').setAttribute('data-i18n', on ? 'mascot-hide-menu' : 'mascot-show');
   translate($('#mascot-toggle').parentElement);
 }
 

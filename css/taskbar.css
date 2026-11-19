@@ -87,6 +87,8 @@
 .sm-leftcol { display: flex; flex-direction: column; min-width: 0; background: #fff; }
 .sm-left { flex: 1; }
 .sm-leftcol.all .sm-left { max-height: 340px; overflow-y: auto; }
+.sm-leftcol.all .sm-left li > button { padding-top: 3px; padding-bottom: 3px; }
+.sm-leftcol.all .sm-left li > button svg, .sm-leftcol.all .sm-left li > button img { width: 22px; height: 22px; }
 .sm-right { background: #D3E5FA; border-left: 1px solid #95BDE7; }
 .sm-body li > button, .sm-body li > a {
   width: 100%; display: flex; align-items: center; gap: 8px; padding: 6px 10px; cursor: var(--hand);
@@ -104,12 +106,21 @@
 }
 .sm-all svg { width: 18px; height: 18px; flex: none; }
 .sm-leftcol.all .sm-all svg { transform: scaleX(-1); }
+.sm-leftcol.all .sm-all { flex-direction: row; }
+.sm-leftcol:not(.all) .sm-all { flex-direction: row-reverse; }
 .sm-all:hover, .sm-all:focus-visible { background: var(--select); color: #fff; outline: none; }
 /* right column: 24px icons, dark navy text that only turns bright blue and underlined on hover */
 .sm-right li > a { gap: 8px; color: #0A1A4A; font-weight: 700; }
 .sm-right li > a img { width: 24px; height: 24px; }
 .sm-right li > a:hover, .sm-right li > a:focus-visible { background: none; color: #0033FF; text-decoration: underline; }
 .sm-right li > button { color: #0A1A4A; font-weight: 700; }
+.sm-right li > button svg { width: 24px; height: 24px; }
+.sm-right li > button:hover, .sm-right li > button:focus-visible { color: #0033FF; text-decoration: underline; outline: none; }
+.sm-left li.pinned > button { font-weight: 700; }
+.sm-right .sm-sep { margin: 5px 10px; background: #95BDE7; }
+/* system utilities: plain text, like XP's Control Panel / Help / Run */
+.sm-right li.sm-util > button { font-weight: 400; color: #0A1A4A; }
+.sm-right li.sm-util > button img { width: 22px; height: 22px; }
 .sm-foot { display: flex; justify-content: flex-end; align-items: center; gap: 14px; padding: 7px 14px; background: linear-gradient(#1C5ED6, #1A4FC0); }
 .sm-foot button { display: inline-flex; align-items: center; gap: 5px; }
 .sm-foot img { width: 20px; height: 20px; }
