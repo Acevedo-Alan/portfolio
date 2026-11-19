@@ -97,7 +97,8 @@ html.app-failed .welcome { display: none !important; }
 .ws-curtain { position: fixed; inset: 0; z-index: 20001; background: #000; opacity: 0; pointer-events: none; transition: opacity 1.1s ease; }
 .ws-curtain.on { opacity: 1; pointer-events: auto; transition-duration: .65s; }
 
-.ws-offscreen { position: fixed; inset: 0; z-index: 20002; display: grid; place-items: center; padding: 24px; background: #000; color: #C8C8C8; animation: ws-off-in .8s .1s backwards; }
+.ws-offscreen { position: fixed; inset: 0; z-index: 20002; display: grid; place-items: center; padding: 24px; background: #000; color: #C8C8C8; }
+.ws-offscreen .ws-off-text { animation: ws-off-in .8s .1s backwards; }
 .ws-offscreen[hidden] { display: none; }
 .ws-off-text { display: grid; gap: 8px; font: 15px/1.5 "Lucida Console", Consolas, "Courier New", monospace; }
 .ws-off-text p { margin: 0; }
@@ -110,6 +111,9 @@ html.app-failed .welcome { display: none !important; }
 .welcome.crt-off { animation: ws-crt-off .95s cubic-bezier(.5, 0, .75, 0) forwards; }
 .welcome.crt-gone { display: none !important; }
 .welcome.crt-on { animation: ws-crt-on .55s ease-out; }
+/* While the picture collapses (and after), nothing of the desktop may show through: the screen is "off", so it is black. */
+html:has(.welcome.crt-off, .welcome.crt-gone), html:has(.welcome.crt-off, .welcome.crt-gone) body { background: #000; }
+html:has(.welcome.crt-off, .welcome.crt-gone) :is(#desktop, .taskbar, .wallpaper, .mascot, #balloon) { visibility: hidden; }
 @keyframes ws-crt-off {
   0%   { transform: scale(1, 1); filter: brightness(1); opacity: 1; }
   45%  { transform: scale(1, .006); filter: brightness(5) saturate(0); opacity: 1; }
@@ -120,7 +124,7 @@ html.app-failed .welcome { display: none !important; }
 
 @media (prefers-reduced-motion: reduce) {
   .ws-curtain, .ws-curtain.on { transition: none; }
-  .ws-pass.shake, .ws-offscreen, .welcome.crt-on { animation: none; }
+  .ws-pass.shake, .ws-offscreen .ws-off-text, .welcome.crt-on { animation: none; }
 }
 
 /* ---------- Recruiter profile: the summary view hides the games and media ---------- */

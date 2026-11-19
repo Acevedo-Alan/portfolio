@@ -51,5 +51,5 @@
 html[data-effects="off"] .boot-bar i { animation: none; left: 8px; }
 html[data-effects="off"] .boot-bar i:nth-child(2) { left: 20px; }
 html[data-effects="off"] .boot-bar i:nth-child(3) { left: 32px; }
-html[data-effects="on"] .power-screen { animation: desktop-in .35s ease-out; }
+/* no fade-in: the screen starts opaque, otherwise the desktop shows through while it fades (the Turn Off dialog's dim backdrop is already gone by then) */
 @media (max-width: 700px) { .power-screen .ws-top, .power-screen .ws-bottom { height: 40px; } .ps-msg { font-size: 20px; } }
